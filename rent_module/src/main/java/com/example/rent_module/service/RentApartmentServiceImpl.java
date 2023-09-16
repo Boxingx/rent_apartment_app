@@ -65,7 +65,6 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private String testGitString;
     @Override
     public GetAddressInfoResponseDto getAddressByCity(String cityName) {
         List<ApartmentEntity> addressInformation = apartmentRepository.findApartmentEntitiesByAddressEntity_City(cityName);
