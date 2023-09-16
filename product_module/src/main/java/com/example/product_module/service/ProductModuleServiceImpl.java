@@ -31,6 +31,9 @@ public class ProductModuleServiceImpl implements ProductModuleService {
 
     private final MailSender mailSender;
 
+    /**
+     * Метод выбора подходящей скидки
+     * */
     public Double prepareProduct(Long id) {
 
         BookingHistoryEntity history = bookingHistoryRepository.findById(id).orElseThrow(() -> new BookingHistoryException());

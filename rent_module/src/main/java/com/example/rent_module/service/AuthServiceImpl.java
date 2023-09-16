@@ -36,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
         return REGISTRATION_SUCCESSFUL;
     }
 
+    /**Метод авторизации*/
     @Override
     public String auth(AuthDto authDto) {
         List<ClientApplicationEntity> result = clientRepository.getClientApplicationEntitiesByLoginMail(authDto.getLogin());

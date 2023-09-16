@@ -177,7 +177,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
     /**
      * Метод принимает объект с координатами, в случае если объект пустой устанавливается код ошибки и сообщение об ошибке, а если
      * не пустой то получаем JSON из которого вытаскивается нужное поле city(на англ языке) парсится на русский язык с помощью метода getCityInRussianLanguage
-     * класса CityTranslationStatic и происходит поиск апартаметов по городу который мы в итоге получили.
+     * класса CityTranslationStatic и происходит поиск апартаметов по городу который мы в итоге получили
      */
     @Override
     public GetAddressInfoResponseDto getApartmentsByLocation(PersonsLocation location) {
