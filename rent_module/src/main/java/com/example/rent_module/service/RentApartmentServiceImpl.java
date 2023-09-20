@@ -5,8 +5,10 @@ import com.example.rent_module.application_exceptions.ApartmentException;
 import com.example.rent_module.application_exceptions.BookApartmentException;
 import com.example.rent_module.integration.GeoCoderRestTemplateManager;
 import com.example.rent_module.integration.ProductRestTemplateManager;
+import com.example.rent_module.integration.YandexWeatherRestTemplateManager;
 import com.example.rent_module.mapper.ApplicationMapper;
 import com.example.rent_module.model.dto.*;
+import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
 import com.example.rent_module.model.dto.yandex_weather_ntegration.YandexWeatherResponse;
 import com.example.rent_module.model.entity.AddressEntity;
 import com.example.rent_module.model.entity.ApartmentEntity;
@@ -35,7 +37,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-import static com.example.rent_module.config.CityTranslationStatic.getCityInRussianLanguage;
+import static com.example.rent_module.config.CityTranslationStatic.*;
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -62,6 +64,8 @@ public class RentApartmentServiceImpl implements RentApartmentService {
     private final BookingHistoryRepository bookingHistoryRepository;
 
     private final ProductRestTemplateManager productRestTemplateManager;
+
+    private final YandexWeatherRestTemplateManager yandexWeatherRestTemplateManager;
 
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -187,15 +191,15 @@ public class RentApartmentServiceImpl implements RentApartmentService {
             getAddressInfoResponseDto.setExceptionMessage(LOCATION_UNKNOWN);
             return getAddressInfoResponseDto;
         }
-//        YandexWeatherResponse weather = getWeatherByLocation(location);
-        String infoByLocation = restTemplateManager.getInfoByLocation(location); //ТУТ СОДЕРЖИТСЯ БОЛЬШОЙ JSON В СТРОКЕ, КОТОРЫЙ ПРИШЕЛ НАМ ОТВЕТОМ ОТ ИНТЕГРАЦИОННОГО СЕРВИСА.
+        YandexWeatherResponse weather = getWeatherByLocation(location);
+        String infoByLocation = restTemplateManager.getInfoByLocation(location); //ТУТ СОДЕРЖИТСЯ ГОРОД НА АНГЛИЙСКОМ
 
         //String englishCity = parseLocationInfo(infoByLocation);
 
         GetAddressInfoResponseDto addressByCity = getAddressByCity(getCityInRussianLanguage(infoByLocation));
 
-//        addressByCity.setTemp(weather.getFactWeather().getTemp());
-//        addressByCity.setCondition(weather.getFactWeather().getCondition());
+        addressByCity.setTemp(weather.getFactWeather().getTemp());
+        addressByCity.setCondition(weather.getFactWeather().getCondition());
         return addressByCity;
     }
 
@@ -254,8 +258,17 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         //TODO Добавить сюда расчет без скидки.
         bookingHistoryRepository.save(bookingHistoryEntity);
 
+        String cityRu = bookingHistoryEntity.getApartmentEntity().getAddressEntity().getCity();
+        String englishCity = getEnglishCityByRuCity(cityRu);
+        String englishCountry = getEnglishCountryByEnglishCity(englishCity);
+
+        Geometry locationByCity = restTemplateManager.getLocationByCity(englishCity, englishCountry);
+
+        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByLocation(locationByCity.getLatitude(), locationByCity.getLongitude());
+
+
         try {
-            Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId());
+            Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), weatherByLocation);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         } catch (Exception e) {
             ApartmentDto apartmentDto = applicationMapper.apartmentEntityToApartmentDto(apartmentEntity);

@@ -6,6 +6,9 @@ import com.example.rent_module.model.dto.PersonsLocation;
 import com.example.rent_module.model.dto.geocoder.Components;
 import com.example.rent_module.model.dto.geocoder.GeoCoderResponse;
 import com.example.rent_module.model.dto.geocoder.ResultIndexElement;
+import com.example.rent_module.model.dto.geocoder_city_to_location.GeoCoderResponseLocation;
+import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
+import com.example.rent_module.model.dto.geocoder_city_to_location.ResultsLoc;
 import com.example.rent_module.model.dto.yandex_weather_ntegration.FactWeather;
 import com.example.rent_module.model.dto.yandex_weather_ntegration.YandexWeatherResponse;
 import com.example.rent_module.model.entity.IntegrationInfoEntity;
@@ -45,9 +48,11 @@ public class GeoCoderRestTemplateManager {
     }
 
 
+    //TODO наверное этот метод должен быть в YandexRestTemplateManager, поэтому нужно переносить.
     public YandexWeatherResponse getWeatherByLocation(PersonsLocation location) {
 
         RestTemplate restTemplate = new RestTemplate();
+
         IntegrationInfoEntity config = integrationRepository.findById(2l)
                 .orElseThrow(() -> new IntegrationConfigurationException());
 
@@ -61,6 +66,30 @@ public class GeoCoderRestTemplateManager {
         return weather;
     }
 
+    public Geometry getLocationByCity(String city, String country) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        IntegrationInfoEntity config = integrationRepository.findById(3l)
+                .orElseThrow(() -> new IntegrationConfigurationException());
+
+        GeoCoderResponseLocation locationByCity = restTemplate.exchange(String.format(config.getServicePath(),
+                        city,
+                        country,
+                        config.getServiceToken()),
+                HttpMethod.GET,
+                new HttpEntity<>(null),
+                GeoCoderResponseLocation.class).getBody();
+        return getGeometryByLocation(locationByCity);
+    }
+
+    private Geometry getGeometryByLocation(GeoCoderResponseLocation locationByCity) {
+        ResultsLoc resultsLoc = locationByCity.getResultsLoc().get(0);
+        Geometry geometry = resultsLoc.getGeometry();
+        return geometry;
+    }
+
+    //TODO наверное переносить вместе с методом getWeatherByLocation
     private MultiValueMap prepareHeadersForWeather(IntegrationInfoEntity config) {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap();
@@ -69,16 +98,8 @@ public class GeoCoderRestTemplateManager {
 
         return multiValueMap;
 
-
-
     }
 
-    private String parseWeatherByLocation(YandexWeatherResponse yandexWeatherResponse) {
-        FactWeather factWeather = yandexWeatherResponse.getFactWeather();
-        String temp = factWeather.getTemp();
-        String condition = factWeather.getCondition();
-        return condition + ", температура воздуха " + temp + " градуса";
-    }
 
     private String parseInfoByLocation(GeoCoderResponse locationInfo) {
         List<ResultIndexElement> resultsObject = locationInfo.getResultsObject();

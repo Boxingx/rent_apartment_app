@@ -34,7 +34,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
     /**
      * Метод выбора подходящей скидки
      * */
-    public Double prepareProduct(Long id) {
+    public Double prepareProduct(Long id, String weather) {
 
         BookingHistoryEntity history = bookingHistoryRepository.findById(id).orElseThrow(() -> new BookingHistoryException());
 
@@ -82,7 +82,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                             break;
                         }
                     }
-                    //TODO
+                    //TODO не рабочий
                     /**Скидка 10% если пользователь зарегистрировался по реферальной ссылке,хранится 3 месяца*/
                     if (p.getId() == 9l) {
                         if (clientApplicationEntity.getParentCity().equals(apartmentEntity.getAddressEntity().getCity())) {
@@ -90,7 +90,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                             break;
                         }
                     }
-                    //TODO
+                    //TODO не рабочий
                     /**Скидка 7% если пользователь арендует квартиру в зимнее время года*/
                     if (p.getId() == 8l && p.getStatus().equals("true")) {
                         if (clientApplicationEntity.getParentCity().equals(apartmentEntity.getAddressEntity().getCity())) {
@@ -137,7 +137,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                     " дней проживания, составил " + history.getFinalPayment() +
                     " вам была предоставлена скидка " + history.getProductEntity().getProductName() +
                     " которая составляет " + history.getProductEntity().getDiscount() +
-                    " процентов. Погода на момент вашего заезда " ,
+                    " процентов. Погода на момент вашего заезда " + weather,
                     history.getClientApplicationEntity().getLoginMail());
 
             return finalPayment;

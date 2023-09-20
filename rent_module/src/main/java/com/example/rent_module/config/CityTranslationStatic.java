@@ -12,6 +12,7 @@ import static com.example.rent_module.constant_project.ConstantProject.NOT_HAVE_
 public class CityTranslationStatic {
 
     private static final Map<String, String> cityTranslationMap = new HashMap<>();
+    private static final Map<String, String> cityCountryMap = new HashMap<>();
 
     static {
         cityTranslationMap.put("Moscow", "Москва");
@@ -26,6 +27,29 @@ public class CityTranslationStatic {
         cityTranslationMap.put("Tver", "Тверь");
         cityTranslationMap.put("Ashdod", "Ashdod");
     }
+
+    static {
+        cityCountryMap.put("Omsk" , "Russia");
+        cityCountryMap.put("Moscow", "Russia");
+    }
+
+    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;  // Если значение не найдено
+    }
+
+    public static String getEnglishCityByRuCity(String cityRu) {
+        return getKeyByValue(cityTranslationMap, cityRu);
+    }
+
+    public static String getEnglishCountryByEnglishCity(String cityEng) {
+        return cityCountryMap.get(cityEng);
+    }
+
 
     public static String getCityInRussianLanguage(String englishCity) {
         return cityTranslationMap.getOrDefault(englishCity,NOT_HAVE_APARTMENT_IN_THIS_CITY);
