@@ -42,4 +42,7 @@ public class BookingHistoryEntity {
 
     @Column(name = "promo_code")
     private String promoCode;
+
+    @Column(name = "scheduler_processing")
+    private Boolean schedulerProcessing;
 }

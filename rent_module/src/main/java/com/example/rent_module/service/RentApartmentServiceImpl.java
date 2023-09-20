@@ -10,14 +10,8 @@ import com.example.rent_module.mapper.ApplicationMapper;
 import com.example.rent_module.model.dto.*;
 import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
 import com.example.rent_module.model.dto.yandex_weather_ntegration.YandexWeatherResponse;
-import com.example.rent_module.model.entity.AddressEntity;
-import com.example.rent_module.model.entity.ApartmentEntity;
-import com.example.rent_module.model.entity.BookingHistoryEntity;
-import com.example.rent_module.model.entity.ClientApplicationEntity;
-import com.example.rent_module.repository.AddressRepository;
-import com.example.rent_module.repository.ApartmentRepository;
-import com.example.rent_module.repository.BookingHistoryRepository;
-import com.example.rent_module.repository.ClientRepository;
+import com.example.rent_module.model.entity.*;
+import com.example.rent_module.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -66,6 +60,8 @@ public class RentApartmentServiceImpl implements RentApartmentService {
     private final ProductRestTemplateManager productRestTemplateManager;
 
     private final YandexWeatherRestTemplateManager yandexWeatherRestTemplateManager;
+
+    private final PromoCodeRepository promoCodeRepository;
 
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -252,10 +248,19 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         BookingHistoryEntity bookingHistoryEntity = prepareAndSaveBookingHistory(apartmentEntity, client, start, end);
 
+        Long paymentWithoutDiscount = Long.parseLong(apartmentEntity.getPrice()) * ChronoUnit.DAYS.between(start,end);
+        Double paymentWithoutDiscountDouble = (double) paymentWithoutDiscount;
+        bookingHistoryEntity.setFinalPayment(paymentWithoutDiscountDouble);
+
         if(nonNull(promoCode)) {
             bookingHistoryEntity.setPromoCode(promoCode);
+            PromoCodeEntity promoCodeEntityByPromoCode = promoCodeRepository.getPromoCodeEntityByPromoCode(promoCode);
+            Long discountNumber = promoCodeEntityByPromoCode.getDiscount();
+            Double discountPercent = (double) discountNumber / 100.0;
+            Double finalPayment = paymentWithoutDiscountDouble - (paymentWithoutDiscountDouble * discountPercent);
+            bookingHistoryEntity.setFinalPayment(finalPayment);
         }
-        //TODO Добавить сюда расчет без скидки.
+
         bookingHistoryRepository.save(bookingHistoryEntity);
 
         String cityRu = bookingHistoryEntity.getApartmentEntity().getAddressEntity().getCity();
@@ -283,7 +288,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         } else {
             discountType = WITHOUT_DISCOUNT;
         }
-        return APARTMENT_BOOKED + start + SPACE + LocalTime.of(12, 0) + TO + end + SPACE + LocalTime.of(12, 0) + discountType;
+        return APARTMENT_BOOKED + start + SPACE + LocalTime.of(12, 0) + TO + end + SPACE + LocalTime.of(12, 0) + discountType + " вся подробная информация отправлена вам на почту";
     }
 
     private BookingHistoryEntity prepareAndSaveBookingHistory(ApartmentEntity apartmentEntity, ClientApplicationEntity client, LocalDate start, LocalDate end) {

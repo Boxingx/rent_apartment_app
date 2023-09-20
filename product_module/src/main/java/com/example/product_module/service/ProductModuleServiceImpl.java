@@ -82,17 +82,9 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                             break;
                         }
                     }
-                    //TODO не рабочий
+                    //TODO не рабочий, не дописан.
                     /**Скидка 10% если пользователь зарегистрировался по реферальной ссылке,хранится 3 месяца*/
-                    if (p.getId() == 9l) {
-                        if (clientApplicationEntity.getParentCity().equals(apartmentEntity.getAddressEntity().getCity())) {
-                            saveProductToBookingHistory(p, history);
-                            break;
-                        }
-                    }
-                    //TODO не рабочий
-                    /**Скидка 7% если пользователь арендует квартиру в зимнее время года*/
-                    if (p.getId() == 8l && p.getStatus().equals("true")) {
+                    if (p.getId() == 7l) {
                         if (clientApplicationEntity.getParentCity().equals(apartmentEntity.getAddressEntity().getCity())) {
                             saveProductToBookingHistory(p, history);
                             break;
@@ -105,23 +97,15 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                             break;
                         }
                     }
-                    /**Скидка 5% если пользователь ввел промокод*/
-                    if (p.getId() == 7l) {
-                        if (nonNull(history.getPromoCode()) && history.getPromoCode().equals(PROMO_CODE)) {
-                                saveProductToBookingHistory(p, history);
-                                break;
-                        }
-                    }
                 }
             }
         }
 
-        long paymentWithoutDiscount = history.getDaysCount() * Long.parseLong(apartmentEntity.getPrice());
 
         if (nonNull(history.getProductEntity().getDiscount())) {
             Long discountNumber = history.getProductEntity().getDiscount();
             Double discountPercent = (double) discountNumber / 100.0;
-            Double finalPayment = (double) paymentWithoutDiscount - (paymentWithoutDiscount * discountPercent);
+            Double finalPayment = history.getFinalPayment() - (history.getFinalPayment() * discountPercent);
             history.setFinalPayment(finalPayment);
             bookingHistoryRepository.save(history);
             mailSender.sendEmail(SUBJECT , "Здравствуйте " + history.getClientApplicationEntity().getNickName() +
@@ -137,14 +121,12 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                     " дней проживания, составил " + history.getFinalPayment() +
                     " вам была предоставлена скидка " + history.getProductEntity().getProductName() +
                     " которая составляет " + history.getProductEntity().getDiscount() +
-                    " процентов. Погода на момент вашего заезда " + weather,
+                    " процентов. Погода на момент вашего заезда " + weather, //TODO погода просто в данный момент, а не в момент заезда, что с этим делать?
                     history.getClientApplicationEntity().getLoginMail());
 
             return finalPayment;
         }
-        Double finalPayment = (double) paymentWithoutDiscount;
-        history.setFinalPayment(finalPayment);
-        return finalPayment;
+        return history.getFinalPayment();
     }
 
     private void saveProductToBookingHistory(ProductEntity productEntity, BookingHistoryEntity history) {

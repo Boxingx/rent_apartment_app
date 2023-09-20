@@ -59,4 +59,6 @@ public class ConstantProject {
     public final static String AND_ROOMS_COUNT = " и количеством комнат ";
     public final static String ROOMS_COUNT = " с количеством комнат ";
 
+    //QUERY CONSTANG
+    public final static String HISTORY_QUERY = "select * from booking_history where scheduler_processing = false";
 }
