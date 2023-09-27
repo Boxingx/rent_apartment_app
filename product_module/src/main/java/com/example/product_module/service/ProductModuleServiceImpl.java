@@ -3,22 +3,21 @@ package com.example.product_module.service;
 
 import com.example.product_module.application_exceptions.BookingHistoryException;
 import com.example.product_module.email_sender.MailSender;
-import com.example.product_module.entity.ApartmentEntity;
-import com.example.product_module.entity.BookingHistoryEntity;
-import com.example.product_module.entity.ClientApplicationEntity;
-import com.example.product_module.entity.ProductEntity;
+import com.example.product_module.entity.*;
 import com.example.product_module.repository.BookingHistoryRepository;
+import com.example.product_module.repository.PhotoRepository;
 import com.example.product_module.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.product_module.constant_project.ConstantProject.*;
-import static java.util.Objects.isNull;
+import static com.example.product_module.constant_project.ConstantProject.SUBJECT;
+import static com.example.product_module.constant_project.ConstantProject.TRUE;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -28,6 +27,8 @@ public class ProductModuleServiceImpl implements ProductModuleService {
     private final BookingHistoryRepository bookingHistoryRepository;
 
     private final ProductRepository productRepository;
+
+    private final PhotoRepository photoRepository;
 
     private final MailSender mailSender;
 
@@ -108,7 +109,14 @@ public class ProductModuleServiceImpl implements ProductModuleService {
             Double finalPayment = history.getFinalPayment() - (history.getFinalPayment() * discountPercent);
             history.setFinalPayment(finalPayment);
             bookingHistoryRepository.save(history);
-            mailSender.sendEmail(SUBJECT , "Здравствуйте " + history.getClientApplicationEntity().getNickName() +
+
+            List<PhotoEntity> photoEntities = photoRepository.findPhotoEntitiesByApartmentEntity(apartmentEntity.getId());// Загрузите изображение в виде массива байт
+            List<byte[]> photos = new ArrayList<>();
+            for (PhotoEntity p : photoEntities) {
+                photos.add(p.getImageData());
+            }
+
+            mailSender.sendEmailWithImages(SUBJECT , "Здравствуйте " + history.getClientApplicationEntity().getNickName() +
                     ". Квартира в городе " + history.getApartmentEntity().getAddressEntity().getCity() +
                     " забронирована с " + history.getStartDate() +
                     " по " + history.getEndDate() +
@@ -122,7 +130,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                     " вам была предоставлена скидка " + history.getProductEntity().getProductName() +
                     " которая составляет " + history.getProductEntity().getDiscount() +
                     " процентов. Погода на момент вашего заезда " + weather, //TODO погода просто в данный момент, а не в момент заезда, что с этим делать?
-                    history.getClientApplicationEntity().getLoginMail());
+                    history.getClientApplicationEntity().getLoginMail(), photos);
 
             return finalPayment;
         }

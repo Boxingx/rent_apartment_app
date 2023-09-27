@@ -14,6 +14,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
+
 @Service
 @RequiredArgsConstructor
 public class YandexWeatherRestTemplateManager {
@@ -42,7 +44,7 @@ public class YandexWeatherRestTemplateManager {
     private MultiValueMap prepareHeadersForWeather(IntegrationInfoEntity config) {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap();
-        multiValueMap.add(config.getServiceId(), config.getServiceToken());
+        multiValueMap.add(config.getServiceId(), decode(config.getServiceToken()));
 
         return multiValueMap;
 

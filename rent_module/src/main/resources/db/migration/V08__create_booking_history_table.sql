@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS booking_history(
     product int8 REFERENCES product_info(product_id),
     days_count int8,
     final_payment double precision,
-    promo_code varchar
+    promo_code varchar,
+    scheduler_processing varchar default 'false'
 );

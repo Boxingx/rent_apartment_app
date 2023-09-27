@@ -16,7 +16,7 @@ public class BookingHistoryEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "apartment_id")
     private ApartmentEntity apartmentEntity;
 
@@ -44,5 +44,5 @@ public class BookingHistoryEntity {
     private String promoCode;
 
     @Column(name = "scheduler_processing")
-    private Boolean schedulerProcessing;
+    private String schedulerProcessing;
 }

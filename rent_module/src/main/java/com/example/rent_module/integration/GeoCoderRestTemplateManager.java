@@ -2,6 +2,7 @@ package com.example.rent_module.integration;
 
 
 import com.example.rent_module.application_exceptions.IntegrationConfigurationException;
+import com.example.rent_module.base64.ApplicationEncoderDecoder;
 import com.example.rent_module.model.dto.PersonsLocation;
 import com.example.rent_module.model.dto.geocoder.Components;
 import com.example.rent_module.model.dto.geocoder.GeoCoderResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
 import static com.example.rent_module.constant_project.ConstantProject.CITY_NO_EXISTS;
 
 @Service
@@ -40,7 +42,7 @@ public class GeoCoderRestTemplateManager {
         GeoCoderResponse locationInfo = restTemplate.exchange(String.format(config.getServicePath(),
                         location.getLatitude(),
                         location.getLongitude(),
-                        config.getServiceToken()),
+                        decode(config.getServiceToken())),
                 HttpMethod.GET,
                 new HttpEntity<>(null),
                 GeoCoderResponse.class).getBody();
@@ -76,7 +78,7 @@ public class GeoCoderRestTemplateManager {
         GeoCoderResponseLocation locationByCity = restTemplate.exchange(String.format(config.getServicePath(),
                         city,
                         country,
-                        config.getServiceToken()),
+                        decode(config.getServiceToken())),
                 HttpMethod.GET,
                 new HttpEntity<>(null),
                 GeoCoderResponseLocation.class).getBody();
@@ -94,7 +96,7 @@ public class GeoCoderRestTemplateManager {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap();
 
-        multiValueMap.add(config.getServiceId(), config.getServiceToken());
+        multiValueMap.add(config.getServiceId(), decode(config.getServiceToken()));
 
         return multiValueMap;
 

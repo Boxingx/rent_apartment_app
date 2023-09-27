@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.encode;
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static java.util.Objects.isNull;
 
@@ -32,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
         if(!resultMail.isEmpty()) {
             return LOGIN_IS_TAKEN;
         }
+        String encode = encode(clientApplicationEntity.getPassword());
+        clientApplicationEntity.setPassword(encode);
         clientRepository.save(clientApplicationEntity);
         return REGISTRATION_SUCCESSFUL;
     }
@@ -43,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         if(result.isEmpty()) {
             return USER_NOT_EXIST;
         }
-        if(result.get(0).getPassword().equals(authDto.getPassword())) {
+        if(decode(result.get(0).getPassword()).equals(authDto.getPassword())) {
             userSession.setNickName(result.get(0).getNickName());
             userSession.setLogin(result.get(0).getLoginMail());
             return WELCOME;

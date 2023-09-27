@@ -18,9 +18,17 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,10 +39,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
+import static com.example.rent_module.base64.ApplicationEncoderDecoder.decodeToByte;
 import static com.example.rent_module.config.CityTranslationStatic.*;
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.BooleanUtils.FALSE;
 
 
 @Service
@@ -63,7 +74,49 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     private final PromoCodeRepository promoCodeRepository;
 
+    private final PhotoRepository photoRepository;
+
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+
+    public ResponseEntity<byte[]> getImage(Long id) {
+
+        PhotoEntity photoEntity = photoRepository.getPhotoEntityById(id);
+        byte[] photo = photoEntity.getImageData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentLength(photo.length);
+
+        ResponseEntity response = new ResponseEntity<>(photo, headers, HttpStatus.OK);
+
+        return response;
+    }
+
+    public boolean checkPhotoCount(int count) {
+        if (count >= 5) {
+            throw new RuntimeException("У квартиры максимальное количество вложений");
+        }
+        return true;
+    }
+
+    public String addPhoto(Long id, MultipartFile multipartFile) {
+        //TODO реализовать проверку на размер фото.
+        List<PhotoEntity> entityList = photoRepository.findPhotoEntitiesByApartmentEntity(id);
+        int count = entityList.size();
+        checkPhotoCount(count);
+        ApartmentEntity apartmentEntityById = apartmentRepository.getApartmentEntityById(id);
+        PhotoEntity photoEntity = new PhotoEntity();
+        photoEntity.setApartmentEntity(apartmentEntityById);
+        try {
+            byte[] bytes = multipartFile.getBytes();
+            photoEntity.setImageData(bytes);
+            photoRepository.save(photoEntity);
+            return "Фото успешно добавлено";
+        } catch (IOException e) {
+            throw new RuntimeException("Сервис временно недоступен, попробуйте позже");
+        }
+    }
 
     @Override
     public GetAddressInfoResponseDto getAddressByCity(String cityName) {
@@ -298,6 +351,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         bookingHistoryEntity.setStartDate(start);
         bookingHistoryEntity.setEndDate(end);
         bookingHistoryEntity.setDaysCount(ChronoUnit.DAYS.between(start, end));
+        bookingHistoryEntity.setSchedulerProcessing(FALSE);
         return bookingHistoryEntity;
     }
 

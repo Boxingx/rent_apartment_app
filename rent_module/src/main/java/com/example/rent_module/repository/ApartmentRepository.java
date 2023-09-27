@@ -37,4 +37,6 @@ public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long
     ApartmentEntity getApartmentEntitiesByIdAndAverageRating(Long apartmentId, String averageRating);
 
     ApartmentEntity getApartmentEntityById(Long id);
+
+
 }

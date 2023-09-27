@@ -6,6 +6,8 @@ import com.example.rent_module.model.dto.ApartmentDto;
 import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.GetAddressInfoResponseDto;
 import com.example.rent_module.model.dto.PersonsLocation;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +33,10 @@ public interface RentApartmentService {
     ApartmentWithMessageDto registrationNewApartment(ApartmentDto apartmentDto);
 
     ApartmentWithMessageDto bookApartment(Long id, LocalDate start, LocalDate end, String promoCode);
+
+    ResponseEntity<byte[]> getImage(Long id);
+
+    String addPhoto(Long id, MultipartFile multipartFile);
 
 }
 

@@ -4,7 +4,9 @@ package com.example.rent_module.controller;
 import com.example.rent_module.model.dto.*;
 import com.example.rent_module.service.RentApartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -23,6 +25,16 @@ public class RentApartmentController {
     @Autowired
     private UserSession userSession;
 
+
+    @GetMapping("/api/photo")
+    public ResponseEntity<byte[]> getImageById(@RequestParam Long id) {
+        return rentApartmentService.getImage(id);
+    }
+
+    @PostMapping("/api/add_photo")
+    public String addPhotoToApartment(@RequestParam Long id, @RequestParam MultipartFile multipartFile) {
+        return rentApartmentService.addPhoto(id, multipartFile);
+    }
 
     /**
      * Метод выгружает пользователю квартиры по определенным параметрам
@@ -88,14 +100,4 @@ public class RentApartmentController {
         }
         return rentApartmentService.registrationNewApartment(apartmentDto);
     }
-
-
-
-
-    //31.783272, 34.662766
-    //обычный коммент
-    //TODO todo коммент
-    /**
-     * Описывающий коммент
-     * */
 }

@@ -37,4 +37,7 @@ public class ApartmentEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apartmentEntity")
     private List<RatingEntity> ratings;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apartmentEntity")
+    private List<PhotoEntity> photos;
+
 }
