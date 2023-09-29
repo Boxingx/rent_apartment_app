@@ -259,7 +259,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     @Override
     public ApartmentWithMessageDto getApartmentById(Long id) {
-        ApartmentEntity apartmentEntity = apartmentRepository.findById(id).orElseThrow(() -> new ApartmentException());
+        ApartmentEntity apartmentEntity = apartmentRepository.findById(id).orElseThrow(() -> new ApartmentException(APARTMENT_ERROR));
         if (apartmentEntity.getStatus().equals("false")) {
             return new ApartmentWithMessageDto(APARTMENT_STATUS_FALSE, applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }

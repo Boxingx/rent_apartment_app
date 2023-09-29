@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApartmentException.class)
     public ResponseEntity<?> handleBindException(ApartmentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getAPARTMENT_ERROR());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(BookApartmentException.class)

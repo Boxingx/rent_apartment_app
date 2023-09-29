@@ -10,7 +10,6 @@ public interface PhotoRepository extends JpaRepository<PhotoEntity,Long> {
 
     PhotoEntity getPhotoEntityById(Long id);
 
-
     List<PhotoEntity> findPhotoEntitiesByApartmentEntity_Id(Long id);
 
     @Query(value = "select p from PhotoEntity p where p.apartmentEntity.id = :id")

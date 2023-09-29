@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public class ApartmentException extends RuntimeException {
 
-    private final String APARTMENT_ERROR = "123";
-
+    public ApartmentException(String message) {
+        super(message);
+    }
 }

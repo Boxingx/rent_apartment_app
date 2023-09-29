@@ -20,6 +20,8 @@ public class ConstantProject {
     //CONSTANT ERROR MESSAGE
     public final static String LATITUDE_ERROR = "Определение вашей локации невозможно";
     public final static String LONGITUDE_ERROR = "Определение вашей локации невозможно";
+    public final static String APARTMENT_ERROR = "123";
+
 //    public final static String NO_INTEGRATION_DATA = "Отсутствуют базовые параметры для интеграции";
 
 
