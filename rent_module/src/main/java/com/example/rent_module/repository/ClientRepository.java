@@ -10,8 +10,12 @@ import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository <ClientApplicationEntity, Long> {
 
-    ClientApplicationEntity getClientApplicationEntitiesByNickName (String nickName);
+    ClientApplicationEntity getClientApplicationEntityByNickName(String nickName);
 
-    List<ClientApplicationEntity> getClientApplicationEntitiesByLoginMail (String loginMail);
+    ClientApplicationEntity getClientApplicationEntitiesByLoginMail (String loginMail);
+
+    List<ClientApplicationEntity> findClientApplicationEntitiesByUserTokenNotNull();
+
+    ClientApplicationEntity findClientApplicationEntitiesByUserToken(String userToken);
 
 }

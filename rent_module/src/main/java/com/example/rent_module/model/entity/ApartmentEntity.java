@@ -40,4 +40,8 @@ public class ApartmentEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apartmentEntity")
     private List<PhotoEntity> photos;
 
+    @ManyToOne
+    @JoinColumn(name = "owner")
+    private ClientApplicationEntity clientApplicationEntity;
+
 }

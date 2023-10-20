@@ -6,6 +6,8 @@ import com.example.rent_module.model.entity.AddressEntity;
 import com.example.rent_module.model.entity.ApartmentEntity;
 import org.mapstruct.Mapper;
 
+
+/**Интерфейс для маппинга, работает с плагином MapStruct*/
 @Mapper(componentModel = "spring")
 public interface ApplicationMapper {
 

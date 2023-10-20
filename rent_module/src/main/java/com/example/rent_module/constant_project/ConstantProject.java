@@ -20,9 +20,16 @@ public class ConstantProject {
     //CONSTANT ERROR MESSAGE
     public final static String LATITUDE_ERROR = "Определение вашей локации невозможно";
     public final static String LONGITUDE_ERROR = "Определение вашей локации невозможно";
-    public final static String APARTMENT_ERROR = "123";
 
-//    public final static String NO_INTEGRATION_DATA = "Отсутствуют базовые параметры для интеграции";
+
+    //EXCEPTION MESSAGE
+    public final static String APARTMENT_ERROR = "Апартаменты не найдены";
+    public final static String ERROR_DESCRIPTION = "Отсутствует конфигурация для текущей интеграции";
+    public final static String NO_INTEGRATION_DATA = "Отсутствуют базовые параметры для интеграции";
+    public final static String PHOTO_SIZE_ERROR = "Недопустимый размер фотографии";
+    public final static String PHOTO_COUNT_ERROR = "Недопустимое количество фотографий";
+    public final static String LOCATION_ERROR = "Локация не найдена";
+    public final static String SERVICE_UNAVAILABLE = "Сервис временно недоступен, попробуйте позже";
 
 
     //CONSTANT CODE
@@ -31,8 +38,10 @@ public class ConstantProject {
     public final static String ERROR_CODE_260 = "260";
     public final static String ERROR_CODE_265 = "265";
 
-    //CONSTANT MESSAGE
 
+    //CONSTANT MESSAGE
+    public final static String INFO_SEND_TO_MAIL = " вся подробная информация отправлена вам на почту";
+    public final static String PHOTO_ADDED = "Фото успешно добавлено";
     public final static String WITHOUT_DISCOUNT = " без скидки";
     public final static String YOUR_PAYMENT = " ваш платеж ";
     public final static String TO = " по ";
@@ -41,7 +50,7 @@ public class ConstantProject {
     public final static String SIGN_IN = "Войдите в систему";
     public final static String USER_NOT_EXIST = "Пользователя не существует";
     public final static String WRONG_PASSWORD = "Неправильный пароль";
-    public final static String WELCOME = "Добро пожаловать";
+    public final static String WELCOME = "Добро пожаловать ";
     public final static String REGISTRATION_SUCCESSFUL = "Пользователь успешно зарегистрирован";
     public final static String ENTER_APARTMENT_DATA = "Введите данные о квартире";
     public final static String NICKNAME_IS_TAKEN = "Пользователь с таким никнеймом уже существует";
@@ -60,8 +69,8 @@ public class ConstantProject {
     public final static String WITH_PRICE = " c ценой ";
     public final static String AND_ROOMS_COUNT = " и количеством комнат ";
     public final static String ROOMS_COUNT = " с количеством комнат ";
-
     public final static String TRUE = "true";
+
 
     //QUERY CONSTANT
     public final static String HISTORY_QUERY = "select * from booking_history where scheduler_processing = false";

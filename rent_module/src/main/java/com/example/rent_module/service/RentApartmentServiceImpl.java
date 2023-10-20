@@ -3,13 +3,13 @@ package com.example.rent_module.service;
 
 import com.example.rent_module.application_exceptions.ApartmentException;
 import com.example.rent_module.application_exceptions.BookApartmentException;
+import com.example.rent_module.application_exceptions.PhotoException;
 import com.example.rent_module.integration.GeoCoderRestTemplateManager;
 import com.example.rent_module.integration.ProductRestTemplateManager;
-import com.example.rent_module.integration.YandexWeatherRestTemplateManager;
+import com.example.rent_module.integration.YandexWeatherRestTemplateManagerImpl;
 import com.example.rent_module.mapper.ApplicationMapper;
 import com.example.rent_module.model.dto.*;
 import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
-import com.example.rent_module.model.dto.yandex_weather_ntegration.YandexWeatherResponse;
 import com.example.rent_module.model.entity.*;
 import com.example.rent_module.repository.*;
 import jakarta.persistence.EntityManager;
@@ -17,18 +17,15 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -38,9 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
-import static com.example.rent_module.base64.ApplicationEncoderDecoder.decodeToByte;
 import static com.example.rent_module.config.CityTranslationStatic.*;
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static java.util.Objects.isNull;
@@ -62,74 +56,22 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     private final GeoCoderRestTemplateManager restTemplateManager;
 
-    private final UserSession userSession;
-
     private final ClientRepository clientRepository;
 
     private final BookingHistoryRepository bookingHistoryRepository;
 
     private final ProductRestTemplateManager productRestTemplateManager;
 
-    private final YandexWeatherRestTemplateManager yandexWeatherRestTemplateManager;
+    private final YandexWeatherRestTemplateManagerImpl yandexWeatherRestTemplateManager;
 
     private final PromoCodeRepository promoCodeRepository;
 
     private final PhotoRepository photoRepository;
 
-    public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final JdbcTemplate jdbcTemplate;
 
+    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ResponseEntity<byte[]> getImage(Long id) {
-
-        PhotoEntity photoEntity = photoRepository.getPhotoEntityById(id);
-        byte[] photo = photoEntity.getImageData();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        headers.setContentLength(photo.length);
-
-        ResponseEntity response = new ResponseEntity<>(photo, headers, HttpStatus.OK);
-
-        return response;
-    }
-
-    public boolean checkPhotoCount(int count) {
-        if (count >= 5) {
-            throw new RuntimeException("У квартиры максимальное количество вложений");
-        }
-        return true;
-    }
-
-    public String addPhoto(Long id, MultipartFile multipartFile) {
-        //TODO реализовать проверку на размер фото.
-        List<PhotoEntity> entityList = photoRepository.findPhotoEntitiesByApartmentEntity(id);
-        int count = entityList.size();
-        checkPhotoCount(count);
-        ApartmentEntity apartmentEntityById = apartmentRepository.getApartmentEntityById(id);
-        PhotoEntity photoEntity = new PhotoEntity();
-        photoEntity.setApartmentEntity(apartmentEntityById);
-        try {
-            byte[] bytes = multipartFile.getBytes();
-            photoEntity.setImageData(bytes);
-            photoRepository.save(photoEntity);
-            return "Фото успешно добавлено";
-        } catch (IOException e) {
-            throw new RuntimeException("Сервис временно недоступен, попробуйте позже");
-        }
-    }
-
-    @Override
-    public GetAddressInfoResponseDto getAddressByCity(String cityName) {
-        List<ApartmentEntity> addressInformation = apartmentRepository.findApartmentEntitiesByAddressEntity_City(cityName);
-
-        if (addressInformation.isEmpty()) {
-            GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
-            getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_250);
-            getAddressInfoResponseDto.setExceptionMessage(NOT_HAVE_APARTMENT_IN_THIS_CITY);
-            return getAddressInfoResponseDto;
-        }
-        return new GetAddressInfoResponseDto(apartmentEntityToDto(addressInformation));
-    }
 
     //QUERY WITH CRITERIA API
     private List<AddressEntity> getAddressInformationByCriteria(String cityName) {
@@ -140,19 +82,42 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         query.select(root).where(criteriaBuilder.equal(root.get("city"), cityName));
         List<AddressEntity> resultList = entityManager.createQuery(query).getResultList();
+
         return resultList;
     }
 
+
+    /**
+     * Метод выгружает квартиры по определенному городу
+     */
+    @Override
+    public GetAddressInfoResponseDto getAddressByCity(String cityName) {
+        List<ApartmentEntity> apartmentsList = apartmentRepository.findApartmentEntitiesByAddressEntity_City(cityName);
+
+        if (apartmentsList.isEmpty()) {
+            GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
+            getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_250);
+            getAddressInfoResponseDto.setExceptionMessage(NOT_HAVE_APARTMENT_IN_THIS_CITY);
+
+            return getAddressInfoResponseDto;
+        }
+        return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentsList));
+    }
+
+
+    //TODO Метод не используется потому что заменили на другой который еще не доделан(нужно дописать что бы возвращал квартиры ниже указанной цены, а не только по указанной цене), т.к. прошлый метод не дописан этот оставил.
     public GetAddressInfoResponseDto getApartmentByPrice(Long price) {
         List<ApartmentEntity> apartmentEntityList = apartmentRepository.getApartmentInfo(price);
         if (apartmentEntityList.isEmpty()) {
             GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APT_WITH_THIS_PRICE + price);
+
             return getAddressInfoResponseDto;
         }
         return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntityList));
     }
+
 
     public GetAddressInfoResponseDto getApartmentByCityAndRoomsCount(String city, String roomsCount) {
         List<ApartmentEntity> apartmentEntityList = apartmentRepository.findApartmentEntitiesByRoomsCountAndAddressEntity_City(roomsCount, city);
@@ -160,50 +125,53 @@ public class RentApartmentServiceImpl implements RentApartmentService {
             GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + ROOMS_COUNT + roomsCount);
+
             return getAddressInfoResponseDto;
         }
         return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntityList));
     }
 
+
     @Override
     public GetAddressInfoResponseDto getApartmentByCityAndPrice(String city, String price) {
+        //TODO сделать что бы выгрузка было по цене меньше или сделать 2 принимаемых значения с ценой от и до.
         List<ApartmentEntity> apartmentEntityList = apartmentRepository.findApartmentEntitiesByPriceAndAddressEntity_City(price, city);
         if (apartmentEntityList.isEmpty()) {
             GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + WITH_PRICE + price);
+
             return getAddressInfoResponseDto;
         }
         return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntityList));
     }
 
+
     @Override
-    public GetAddressInfoResponseDto getApartmentByCityAndPriceAndRoomsCount(String city, String price, String roomsCount) {
-        List<ApartmentEntity> apartmentEntitiesList = apartmentRepository.findApartmentEntitiesByRoomsCountAndPriceAndAddressEntity_City(roomsCount, price, city);
+    public GetAddressInfoResponseDto getApartmentByCityAndPriceAndRoomsCount(String city, String priceTo, String roomsCount) {
+        List<ApartmentEntity> apartmentEntitiesList = apartmentRepository.findApartmentEntitiesByRoomsCountAndPriceToAndAddressEntity_City(roomsCount, priceTo, city);
         if (apartmentEntitiesList.isEmpty()) {
             GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
-            getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + WITH_PRICE + price + AND_ROOMS_COUNT + roomsCount);
+            getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + WITH_PRICE + priceTo + AND_ROOMS_COUNT + roomsCount);
+
             return getAddressInfoResponseDto;
         }
         return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntitiesList));
     }
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Override
     public GetAddressInfoResponseDto findApartmentEntitiesByAverageRatingAndAddressEntity_City(String cityName, String averageRating) {
-
         GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
         List<ApartmentEntity> apartmentList = apartmentRepository.findApartmentEntitiesByAddressEntity_City(cityName);
-
 
         List<ApartmentEntity> apartmentListAfterChange = new ArrayList<>();
 
         if (apartmentList.isEmpty()) {
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_WITH_CITY_FILTER);
+
             return getAddressInfoResponseDto;
         }
 
@@ -221,11 +189,14 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         if (result.isEmpty()) {
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_WITH_RATING_FILTER);
+
             return getAddressInfoResponseDto;
         }
         getAddressInfoResponseDto.setApartmentDtoList(apartmentEntityToDto(result));
+
         return getAddressInfoResponseDto;
     }
+
 
     /**
      * Метод принимает объект с координатами, в случае если объект пустой устанавливается код ошибки и сообщение об ошибке, а если
@@ -238,24 +209,27 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         if (location == null) {
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(LOCATION_UNKNOWN);
+
             return getAddressInfoResponseDto;
         }
-        YandexWeatherResponse weather = getWeatherByLocation(location);
+
+//        YandexWeatherResponse weather = yandexWeatherRestTemplateManager.getWeatherByLocation(location);
         String infoByLocation = restTemplateManager.getInfoByLocation(location); //ТУТ СОДЕРЖИТСЯ ГОРОД НА АНГЛИЙСКОМ
 
         //String englishCity = parseLocationInfo(infoByLocation);
 
         GetAddressInfoResponseDto addressByCity = getAddressByCity(getCityInRussianLanguage(infoByLocation));
 
-        addressByCity.setTemp(weather.getFactWeather().getTemp());
-        addressByCity.setCondition(weather.getFactWeather().getCondition());
+//        addressByCity.setTemp(weather.getFactWeather().getTemp());
+//        addressByCity.setCondition(weather.getFactWeather().getCondition());
+
+        //TODO Временно для тестов
+        addressByCity.setTemp("27");
+        addressByCity.setCondition("облачно");
+
         return addressByCity;
     }
 
-    private YandexWeatherResponse getWeatherByLocation(PersonsLocation location) {
-        YandexWeatherResponse weatherByLocation = restTemplateManager.getWeatherByLocation(location);
-        return weatherByLocation;
-    }
 
     @Override
     public ApartmentWithMessageDto getApartmentById(Long id) {
@@ -268,22 +242,23 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
 
     @Override
-    public ApartmentWithMessageDto registrationNewApartment(ApartmentDto apartmentDto) {
-
+    public ApartmentWithMessageDto registrationNewApartment(ApartmentDto apartmentDto, String token) {
+        ClientApplicationEntity client = clientRepository.findClientApplicationEntitiesByUserToken(token);
         ApartmentEntity apartmentEntity = applicationMapper.apartmentDtoToApartmentEntity(apartmentDto);
         apartmentEntity.setRegistrationDate(LocalDateTime.now().format(formatter));
+        apartmentEntity.setClientApplicationEntity(client);
         apartmentRepository.save(apartmentEntity);
-        AddressEntity AddressEntity = applicationMapper.addressDtoToAddressEntity(apartmentDto.getAddressDto());
-        AddressEntity.setApartmentEntity(apartmentEntity);
-        addressRepository.save(AddressEntity);
+        AddressEntity addressEntity = applicationMapper.addressDtoToAddressEntity(apartmentDto.getAddressDto());
+        addressEntity.setApartmentEntity(apartmentEntity);
+        addressRepository.save(addressEntity);
 
         return new ApartmentWithMessageDto(APARTMENT_SAVED, apartmentDto);
 
     }
 
-    @Override
-    public ApartmentWithMessageDto bookApartment(Long id, LocalDate start, LocalDate end, String promoCode) {
 
+    @Override
+    public ApartmentWithMessageDto bookApartment(Long id, LocalDate start, LocalDate end, String promoCode, String userToken) {
         ApartmentEntity apartmentEntity = apartmentRepository.getApartmentEntityById(id);
 
         if (apartmentEntity.getStatus().equals("false")) {
@@ -293,19 +268,17 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         apartmentEntity.setStatus("false");
         apartmentRepository.save(apartmentEntity);
 
-        String sessionNickName = userSession.getNickName();
-
-        ClientApplicationEntity client = clientRepository.getClientApplicationEntitiesByNickName(sessionNickName);
+        ClientApplicationEntity client = clientRepository.findClientApplicationEntitiesByUserToken(userToken);
 
         clientRepository.save(incrementBookingCount(client));
 
-        BookingHistoryEntity bookingHistoryEntity = prepareAndSaveBookingHistory(apartmentEntity, client, start, end);
+        BookingHistoryEntity bookingHistoryEntity = prepareBookingHistory(apartmentEntity, client, start, end);
 
-        Long paymentWithoutDiscount = Long.parseLong(apartmentEntity.getPrice()) * ChronoUnit.DAYS.between(start,end);
+        Long paymentWithoutDiscount = Long.parseLong(apartmentEntity.getPrice()) * ChronoUnit.DAYS.between(start, end);
         Double paymentWithoutDiscountDouble = (double) paymentWithoutDiscount;
         bookingHistoryEntity.setFinalPayment(paymentWithoutDiscountDouble);
 
-        if(nonNull(promoCode)) {
+        if (nonNull(promoCode)) {
             bookingHistoryEntity.setPromoCode(promoCode);
             PromoCodeEntity promoCodeEntityByPromoCode = promoCodeRepository.getPromoCodeEntityByPromoCode(promoCode);
             Long discountNumber = promoCodeEntityByPromoCode.getDiscount();
@@ -322,29 +295,80 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         Geometry locationByCity = restTemplateManager.getLocationByCity(englishCity, englishCountry);
 
-        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByLocation(locationByCity.getLatitude(), locationByCity.getLongitude());
+        //TODO временно
+//        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByCoordinates(locationByCity.getLatitude(), locationByCity.getLongitude());
 
 
         try {
-            Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), weatherByLocation);
+            Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), null);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         } catch (Exception e) {
-            ApartmentDto apartmentDto = applicationMapper.apartmentEntityToApartmentDto(apartmentEntity);
-            throw new BookApartmentException(prepareBookingResponse(start, end , false, null ), apartmentDto);
+            throw new BookApartmentException(prepareBookingResponse(start, end, false, null), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }
     }
 
-    private String prepareBookingResponse(LocalDate start, LocalDate end, boolean flag, Double finalPayment) {
+
+    public ResponseEntity<byte[]> getImage(Long id) {
+        PhotoEntity photoEntity = photoRepository.getPhotoEntityById(id);
+        byte[] photo = photoEntity.getImageData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentLength(photo.length);
+
+        ResponseEntity response = new ResponseEntity<>(photo, headers, HttpStatus.OK);
+
+        return response;
+    }
+
+
+    public String addPhoto(Long id, MultipartFile multipartFile) {
+        if (!checkPhotoSize(multipartFile)) {
+            throw new PhotoException(PHOTO_SIZE_ERROR);
+        }
+        //TODO реализовать проверку на размер фото,реализовал, но видимо у сервера свои ограничения на 1 мб и какой ответ отдавать на фронт если не прошла проверку,тк сейчас ответ летит только в стектрейс
+        List<PhotoEntity> entityList = photoRepository.findPhotoEntitiesByApartmentEntity(id);
+        int count = entityList.size();
+        checkPhotoCount(count);
+        ApartmentEntity apartmentEntityById = apartmentRepository.getApartmentEntityById(id);
+        PhotoEntity photoEntity = new PhotoEntity();
+        photoEntity.setApartmentEntity(apartmentEntityById);
+        try {
+            byte[] bytes = multipartFile.getBytes();
+            photoEntity.setImageData(bytes);
+            photoRepository.save(photoEntity);
+
+            return PHOTO_ADDED;
+        } catch (IOException e) {
+            throw new PhotoException(SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @Override
+    public GetAddressInfoResponseDto getApartmentByCityAndPriceFromTo(String cityName, String priceFrom, String priceTo) {
+        List<ApartmentEntity> apartmentEntities = apartmentRepository.getApartmentEntitiesByAddressEntity_CityAndPriceGreaterThanEqualAndPriceIsLessThanEqual(cityName, priceFrom, priceTo);
+        if (apartmentEntities.isEmpty()) {
+            throw new ApartmentException(APARTMENT_ERROR);
+        }
+        return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntities));
+    }
+
+
+    /**
+     * Метод для подготовки сообщения
+     */
+    private String prepareBookingResponse(LocalDate start, LocalDate end, boolean discountFlag, Double finalPayment) {
         String discountType;
-        if (flag) {
+        if (discountFlag) {
             discountType = YOUR_PAYMENT + finalPayment;
         } else {
             discountType = WITHOUT_DISCOUNT;
         }
-        return APARTMENT_BOOKED + start + SPACE + LocalTime.of(12, 0) + TO + end + SPACE + LocalTime.of(12, 0) + discountType + " вся подробная информация отправлена вам на почту";
+        return APARTMENT_BOOKED + start + SPACE + LocalTime.of(12, 0) + TO + end + SPACE + LocalTime.of(12, 0) + discountType + INFO_SEND_TO_MAIL;
     }
 
-    private BookingHistoryEntity prepareAndSaveBookingHistory(ApartmentEntity apartmentEntity, ClientApplicationEntity client, LocalDate start, LocalDate end) {
+
+    private BookingHistoryEntity prepareBookingHistory(ApartmentEntity apartmentEntity, ClientApplicationEntity client, LocalDate start, LocalDate end) {
         BookingHistoryEntity bookingHistoryEntity = new BookingHistoryEntity();
         bookingHistoryEntity.setApartmentEntity(apartmentEntity);
         bookingHistoryEntity.setClientApplicationEntity(client);
@@ -352,8 +376,10 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         bookingHistoryEntity.setEndDate(end);
         bookingHistoryEntity.setDaysCount(ChronoUnit.DAYS.between(start, end));
         bookingHistoryEntity.setSchedulerProcessing(FALSE);
+
         return bookingHistoryEntity;
     }
+
 
     private ClientApplicationEntity incrementBookingCount(ClientApplicationEntity client) {
         if (isNull(client.getBookingCount())) {
@@ -366,7 +392,6 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
 
     private List<ApartmentDto> apartmentEntityToDto(List<ApartmentEntity> apartmentEntityList) {
-
         List<ApartmentDto> resultList = new ArrayList<>();
 
         for (ApartmentEntity e : apartmentEntityList) {
@@ -379,4 +404,23 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         }
         return resultList;
     }
+
+
+    private boolean checkPhotoCount(int count) {
+        if (count >= 5) {
+            throw new PhotoException(PHOTO_COUNT_ERROR);
+        }
+        return true;
+    }
+
+
+    private boolean checkPhotoSize(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {
+            return false;
+        }
+        long maxSize = 20000000l;
+
+        return multipartFile.getSize() < maxSize;
+    }
+
 }

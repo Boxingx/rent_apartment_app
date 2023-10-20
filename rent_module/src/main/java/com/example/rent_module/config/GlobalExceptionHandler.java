@@ -1,8 +1,6 @@
 package com.example.rent_module.config;
 
-import com.example.rent_module.application_exceptions.ApartmentException;
-import com.example.rent_module.application_exceptions.BookApartmentException;
-import com.example.rent_module.application_exceptions.IntegrationConfigurationException;
+import com.example.rent_module.application_exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -28,7 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IntegrationConfigurationException.class)
     public ResponseEntity<?> handleBindException(IntegrationConfigurationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getERROR_DESCRIPTION());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(ApartmentException.class)
@@ -39,6 +37,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookApartmentException.class)
     public ResponseEntity<?> handleBindException(BookApartmentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getERROR_MESSAGE() + "\n" + ex.getTargetApartment().toString());
+    }
+
+    @ExceptionHandler(RentAuthException.class)
+    public ResponseEntity<?> handleBindException(RentAuthException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(RentRegistrationException.class)
+    public ResponseEntity<?> handleBindException(RentRegistrationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
     //HttpClientErrorException$BadRequest
 }

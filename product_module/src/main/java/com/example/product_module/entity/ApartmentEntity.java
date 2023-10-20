@@ -32,5 +32,7 @@ public class ApartmentEntity {
     @OneToOne(mappedBy = "apartmentEntity")
     private AddressEntity addressEntity;
 
-
+    @ManyToOne
+    @JoinColumn(name = "owner")
+    private ClientApplicationEntity clientApplicationEntity;
 }

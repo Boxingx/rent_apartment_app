@@ -6,8 +6,8 @@ import java.util.Map;
 import static com.example.rent_module.constant_project.ConstantProject.NOT_HAVE_APARTMENT_IN_THIS_CITY;
 
 
-/**Класс со статической мапой, статическим блоком который инициализирует мапу и со статическим методом который
- * принимает город на английском языке(как ключ) и отдает значение по заданному ключу в виде города, но уже на русском языке
+/**Класс со статическими мапами, статическими блоками которые инициализируют эти мапы и со статическими методоми
+ * для подбора города/страны на нужном языке(русский, английский)
  * */
 public class CityTranslationStatic {
 
@@ -25,15 +25,24 @@ public class CityTranslationStatic {
         cityTranslationMap.put("Makhachkala", "Махачкала");
         cityTranslationMap.put("Penza", "Пенза");
         cityTranslationMap.put("Tver", "Тверь");
-        cityTranslationMap.put("Ashdod", "Ashdod");
     }
 
     static {
-        cityCountryMap.put("Omsk" , "Russia");
         cityCountryMap.put("Moscow", "Russia");
+        cityCountryMap.put("Saint Petersburg", "Russia");
+        cityCountryMap.put("Omsk" , "Russia");
+        cityCountryMap.put("Tyumen", "Russia");
+        cityCountryMap.put("Novosibirsk", "Russia");
+        cityCountryMap.put("Krasnoyarsk", "Russia");
+        cityCountryMap.put("Krasnodar", "Russia");
+        cityCountryMap.put("Makhachkala", "Russia");
+        cityCountryMap.put("Penza", "Russia");
+        cityCountryMap.put("Tver", "Russia");
+
     }
 
-    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+    /**Приватный метод принимает мапу и значение и ищет ключ по переданному значению в переданной мапе */
+    private static <K, V> K getKeyByValue(Map<K, V> map, V value) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             if (value.equals(entry.getValue())) {
                 return entry.getKey();
@@ -42,15 +51,17 @@ public class CityTranslationStatic {
         return null;  // Если значение не найдено
     }
 
+    /**Метод принимает город на русском языке и возвращает на английском, проходится по мапе cityTranslationMap */
     public static String getEnglishCityByRuCity(String cityRu) {
         return getKeyByValue(cityTranslationMap, cityRu);
     }
 
+    /**Метод принимает город на английском языке и возвращает страну в которой находится этот город, проходится по мапе cityCountryMap */
     public static String getEnglishCountryByEnglishCity(String cityEng) {
         return cityCountryMap.get(cityEng);
     }
 
-
+    /**Метод принимает город на английском языке и возвращает на русском, проходится по мапе cityTranslationMap */
     public static String getCityInRussianLanguage(String englishCity) {
         return cityTranslationMap.getOrDefault(englishCity,NOT_HAVE_APARTMENT_IN_THIS_CITY);
     }

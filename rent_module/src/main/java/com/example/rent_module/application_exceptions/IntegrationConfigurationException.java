@@ -5,6 +5,8 @@ import lombok.Getter;
 @Getter
 public class IntegrationConfigurationException extends RuntimeException {
 
-    private final String ERROR_DESCRIPTION = "Отсутствует конфигурация для текущей интеграции";
+    public IntegrationConfigurationException(String message){
+        super(message);
+    }
 
 }

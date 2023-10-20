@@ -1,6 +1,7 @@
 package com.example.rent_module.controller;
 
 
+import com.example.rent_module.config.AuthToken;
 import com.example.rent_module.model.dto.AuthDto;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
 import com.example.rent_module.service.AuthService;
@@ -20,12 +21,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(REGISTRATION)
-    public String registrationUser(@RequestBody ClientApplicationEntity clientApplicationEntity) {
+    public AuthToken registrationUser(@RequestBody ClientApplicationEntity clientApplicationEntity) {
         return authService.registration(clientApplicationEntity);
     }
 
     @PostMapping(AUTH)
-    public String authUser(@RequestBody AuthDto authDto){
+    public AuthToken authUser(@RequestBody AuthDto authDto){
         return authService.auth(authDto);
     }
 

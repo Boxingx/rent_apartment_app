@@ -3,6 +3,10 @@ package com.example.product_module.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name = "client_application")
 @Data
@@ -31,5 +35,11 @@ public class ClientApplicationEntity {
 
     @Column(name = "parent_city")
     private String parentCity;
+
+    @Column(name = "user_token")
+    private String userToken;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "clientApplicationEntity")
+    private List<ApartmentEntity> apartmentEntityList;
 
 }

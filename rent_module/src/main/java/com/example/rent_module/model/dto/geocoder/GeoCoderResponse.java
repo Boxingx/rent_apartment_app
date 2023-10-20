@@ -13,6 +13,10 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+/**
+ * Класс создан что бы распарсить Json, для получения только города.
+ * GeoCoderResponse -> ResultIndexElement -> Components
+ * */
 public class GeoCoderResponse {
 
     @JsonProperty(value = "results")

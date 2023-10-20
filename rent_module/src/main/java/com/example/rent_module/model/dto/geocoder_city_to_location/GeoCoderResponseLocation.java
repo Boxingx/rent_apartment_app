@@ -11,6 +11,10 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+/**
+ * Класс создан что бы распарсить Json, для получения широты и долготы.
+ * GeoCoderResponseLocation -> ResultsLoc -> Geometry
+ * */
 public class GeoCoderResponseLocation {
 
     @JsonProperty(value = "results")
