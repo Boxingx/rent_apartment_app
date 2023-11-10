@@ -4,6 +4,7 @@ package com.example.rent_module.service;
 import com.example.rent_module.application_exceptions.RentAuthException;
 import com.example.rent_module.application_exceptions.RentRegistrationException;
 import com.example.rent_module.config.AuthToken;
+import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.AuthDto;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
 import com.example.rent_module.repository.ClientRepository;
@@ -68,7 +69,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ClientApplicationEntity checkValidToken(String token) {
-        return clientRepository.findClientApplicationEntitiesByUserToken(token);
+    public boolean checkValidToken(String token) {
+        ClientApplicationEntity client = clientRepository.findClientApplicationEntitiesByUserToken(token);
+        if (isNull(client)) {
+            return false;
+        }
+        return true;
     }
 }

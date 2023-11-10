@@ -6,10 +6,13 @@ import com.example.rent_module.application_exceptions.BookApartmentException;
 import com.example.rent_module.application_exceptions.PhotoException;
 import com.example.rent_module.integration.GeoCoderRestTemplateManager;
 import com.example.rent_module.integration.ProductRestTemplateManager;
-import com.example.rent_module.integration.YandexWeatherRestTemplateManagerImpl;
+import com.example.rent_module.integration.YandexWeatherRestTemplateManager;
+import com.example.rent_module.kafka.KafkaProducer;
+import com.example.rent_module.kafka.KafkaProducerImpl;
 import com.example.rent_module.mapper.ApplicationMapper;
 import com.example.rent_module.model.dto.*;
 import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
+import com.example.rent_module.model.dto.yandex_weather_integration.YandexWeatherResponse;
 import com.example.rent_module.model.entity.*;
 import com.example.rent_module.repository.*;
 import jakarta.persistence.EntityManager;
@@ -62,13 +65,15 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     private final ProductRestTemplateManager productRestTemplateManager;
 
-    private final YandexWeatherRestTemplateManagerImpl yandexWeatherRestTemplateManager;
+    private final YandexWeatherRestTemplateManager yandexWeatherRestTemplateManager;
 
     private final PromoCodeRepository promoCodeRepository;
 
     private final PhotoRepository photoRepository;
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final KafkaProducer kafkaProducer;
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -213,19 +218,19 @@ public class RentApartmentServiceImpl implements RentApartmentService {
             return getAddressInfoResponseDto;
         }
 
-//        YandexWeatherResponse weather = yandexWeatherRestTemplateManager.getWeatherByLocation(location);
+        YandexWeatherResponse weather = yandexWeatherRestTemplateManager.getWeatherByLocation(location);
         String infoByLocation = restTemplateManager.getInfoByLocation(location); //ТУТ СОДЕРЖИТСЯ ГОРОД НА АНГЛИЙСКОМ
 
         //String englishCity = parseLocationInfo(infoByLocation);
 
         GetAddressInfoResponseDto addressByCity = getAddressByCity(getCityInRussianLanguage(infoByLocation));
 
-//        addressByCity.setTemp(weather.getFactWeather().getTemp());
-//        addressByCity.setCondition(weather.getFactWeather().getCondition());
+        addressByCity.setTemp(weather.getFactWeather().getTemp());
+        addressByCity.setCondition(weather.getFactWeather().getCondition());
 
         //TODO Временно для тестов
-        addressByCity.setTemp("27");
-        addressByCity.setCondition("облачно");
+//        addressByCity.setTemp("27");
+//        addressByCity.setCondition("облачно");
 
         return addressByCity;
     }
@@ -299,10 +304,14 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 //        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByCoordinates(locationByCity.getLatitude(), locationByCity.getLongitude());
 
 
+        //TODO погода null временно для тестов
         try {
             Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), null);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
+
         } catch (Exception e) {
+            //TODO тут пишем в топик
+//            kafkaProducer.sendMessageToTopic("xxx");
             throw new BookApartmentException(prepareBookingResponse(start, end, false, null), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }
     }

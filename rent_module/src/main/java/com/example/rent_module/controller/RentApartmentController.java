@@ -1,12 +1,14 @@
 package com.example.rent_module.controller;
 
 
+import com.example.rent_module.kafka.KafkaProducer;
 import com.example.rent_module.model.dto.ApartmentDto;
 import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.GetAddressInfoResponseDto;
 import com.example.rent_module.model.dto.PersonsLocation;
 import com.example.rent_module.service.AuthService;
 import com.example.rent_module.service.RentApartmentService;
+import com.example.rent_module.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,24 @@ public class RentApartmentController {
     private RentApartmentService rentApartmentService;
 
     @Autowired
+    private ReportService reportService;
+
+    @Autowired
     private AuthService authService;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
+
+    @GetMapping("/testtest")
+    public String testtest(){
+        return "123";
+    }
+
+    @GetMapping ("/api/report")
+    public String getReport(@RequestParam String year, @RequestParam Integer month) {
+        return reportService.getReport(year, month);
+    }
 
     /**
      * Метод позволяет получить фото по id
@@ -90,14 +108,14 @@ public class RentApartmentController {
                                                     @RequestParam(required = false) LocalDate start,
                                                     @RequestParam(required = false) LocalDate end,
                                                     @RequestParam(required = false) String promoCode) {
-        if (isNull(authService.checkValidToken(token))) {
+        if (!authService.checkValidToken(token)) {
             return new ApartmentWithMessageDto(SIGN_IN, null);
         }
-
         if (isNull(start) && isNull(end)) {
             return rentApartmentService.getApartmentById(id);
         }
         if (nonNull(start) && nonNull(end)) {
+            kafkaProducer.sendMessageToTopic("xxx");
             return rentApartmentService.bookApartment(id, start, end, promoCode, token);
         } else return new ApartmentWithMessageDto();
     }
@@ -112,7 +130,7 @@ public class RentApartmentController {
     public ApartmentWithMessageDto addNewApartment(@RequestHeader String token,
                                                    @RequestBody ApartmentDto apartmentDto) {
 
-        if (isNull(authService.checkValidToken(token))) {
+        if (!authService.checkValidToken(token)) {
             return new ApartmentWithMessageDto(SIGN_IN, null);
         }
 

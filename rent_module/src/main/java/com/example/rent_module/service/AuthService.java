@@ -12,5 +12,5 @@ public interface AuthService {
 
     AuthToken auth(@RequestBody AuthDto authDto);
 
-    ClientApplicationEntity checkValidToken(String token);
+    boolean checkValidToken(String token);
 }

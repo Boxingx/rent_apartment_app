@@ -37,5 +37,7 @@ public interface RentApartmentService {
     String addPhoto(Long id, MultipartFile multipartFile);
 
     GetAddressInfoResponseDto getApartmentByCityAndPriceFromTo(String cityName, String priceFrom, String priceTo);
+
+
 }
 

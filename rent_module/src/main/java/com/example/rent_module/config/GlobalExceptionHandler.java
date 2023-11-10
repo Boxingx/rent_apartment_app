@@ -48,5 +48,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBindException(RentRegistrationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity<?> handleBindException(NumberFormatException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     //HttpClientErrorException$BadRequest
 }
