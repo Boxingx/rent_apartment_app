@@ -1,6 +1,6 @@
 package com.example.product_module.kafka;
 
-import com.example.product_module.controller.ProductModelController;
+import com.example.product_module.controller.ProductModuleController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,18 +18,19 @@ public class TopicListenerScheduler {
 
     private final ConsumerListener consumerListener;
 
-    private final ProductModelController productModelController;
+    private final ProductModuleController productModuleController;
 
 
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelay = 30_000)
     public void topicsReader() {
 
         List<String> messages = consumerListener.getMessages();
 
         if (nonNull(messages)) {
             for (String message : messages) {
-                productModelController.addProductForBooking(Long.parseLong(message), null);
+                productModuleController.addProductForBooking(Long.parseLong(message), "123weather123");
             }
+            messages.clear();
         }
     }
 }

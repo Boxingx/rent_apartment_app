@@ -15,7 +15,7 @@ public class ConsumerListener {
     private final List<String> messages = new ArrayList<>();
 
 
-    @KafkaListener(topics = "myTopic", groupId = "UNIQUE_ID")
+    @KafkaListener(topics = "myTopic2", groupId = "UNIQUE_ID")
     public void listen(String message) {
         synchronized (messages) {
             messages.add(message);

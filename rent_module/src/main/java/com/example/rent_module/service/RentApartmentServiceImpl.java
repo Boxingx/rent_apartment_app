@@ -71,6 +71,8 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     private final PhotoRepository photoRepository;
 
+    private final RatingRepository ratingRepository;
+
     private final JdbcTemplate jdbcTemplate;
 
     private final KafkaProducer kafkaProducer;
@@ -279,6 +281,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         BookingHistoryEntity bookingHistoryEntity = prepareBookingHistory(apartmentEntity, client, start, end);
 
+        Double finalPayment = 0.0;
         Long paymentWithoutDiscount = Long.parseLong(apartmentEntity.getPrice()) * ChronoUnit.DAYS.between(start, end);
         Double paymentWithoutDiscountDouble = (double) paymentWithoutDiscount;
         bookingHistoryEntity.setFinalPayment(paymentWithoutDiscountDouble);
@@ -288,7 +291,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
             PromoCodeEntity promoCodeEntityByPromoCode = promoCodeRepository.getPromoCodeEntityByPromoCode(promoCode);
             Long discountNumber = promoCodeEntityByPromoCode.getDiscount();
             Double discountPercent = (double) discountNumber / 100.0;
-            Double finalPayment = paymentWithoutDiscountDouble - (paymentWithoutDiscountDouble * discountPercent);
+            finalPayment = paymentWithoutDiscountDouble - (paymentWithoutDiscountDouble * discountPercent);
             bookingHistoryEntity.setFinalPayment(finalPayment);
         }
 
@@ -306,12 +309,12 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         //TODO погода null временно для тестов
         try {
-            Double finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), null);
+            finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), null);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
 
         } catch (Exception e) {
-            //TODO тут пишем в топик
-//            kafkaProducer.sendMessageToTopic("xxx");
+            //TODO тут пишем в топик, и сообщаем пользователю что серсис расчета скидки в данный момент недоступен, но как только он возобновит свою работу пользователь получит сообщение на почту с уже расчитаной скидкой и ссылкой на оплату.
+            kafkaProducer.sendMessageToTopic(bookingHistoryEntity.getId().toString());
             throw new BookApartmentException(prepareBookingResponse(start, end, false, null), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }
     }
@@ -362,6 +365,16 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntities));
     }
 
+    @Override
+    public String addReviewForApartment(Integer rating, String review, Long apartmentId) {
+        RatingEntity ratingEntity = new RatingEntity();
+        ratingEntity.setRating(rating);
+        ratingEntity.setReview(review);
+        ratingEntity.setApartmentEntity(apartmentRepository.getApartmentEntityById(apartmentId));
+        ratingRepository.save(ratingEntity);
+        return "спасибо за отзыв";
+    }
+
 
     /**
      * Метод для подготовки сообщения
@@ -385,6 +398,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         bookingHistoryEntity.setEndDate(end);
         bookingHistoryEntity.setDaysCount(ChronoUnit.DAYS.between(start, end));
         bookingHistoryEntity.setSchedulerProcessing(FALSE);
+        bookingHistoryEntity.setSchedulerMailReview(FALSE);
 
         return bookingHistoryEntity;
     }

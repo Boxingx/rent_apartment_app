@@ -8,9 +8,13 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 
+
+//todo нет аннотации репозиторий почему всё работает? читать про аннотации
 public interface BookingHistoryRepository extends JpaRepository<BookingHistoryEntity, Long> {
 
     List<BookingHistoryEntity> getBookingHistoryEntitiesBySchedulerProcessingEquals(String s);
 
-    List<BookingHistoryEntity> getBookingHistoryEntitiesByStartDateMonth(Month value);
+    List<BookingHistoryEntity> getBookingHistoryEntitiesByStartDateBetween (LocalDate startDate, LocalDate endDate);
+
+
 }

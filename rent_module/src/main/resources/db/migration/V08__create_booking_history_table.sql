@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS booking_history(
     days_count int8,
     final_payment double precision,
     promo_code varchar,
-    scheduler_processing varchar default 'false'
+    scheduler_processing varchar default 'false',
+    scheduler_mail_review varchar default 'false'
 );

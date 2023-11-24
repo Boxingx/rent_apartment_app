@@ -13,7 +13,7 @@ import static com.example.product_module.constant_project.ConstantProject.ADD_PR
 
 @RestController
 @RequiredArgsConstructor
-public class ProductModelController {
+public class ProductModuleController {
 
     private final MailSender mailSender;
 

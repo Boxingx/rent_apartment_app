@@ -14,7 +14,7 @@ public class KafkaProducerImpl implements KafkaProducer {
 
 
     public String sendMessageToTopic(String message) {
-        kafkaTemplate.send("myTopic", message);
-        return "Сообщение добавлено в топик";
+        kafkaTemplate.send("myTopic2", message);
+        return "Сообщение " + message + " добавлено в топик";
     }
 }

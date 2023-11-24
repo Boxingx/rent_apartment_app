@@ -33,6 +33,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthToken registration(ClientApplicationEntity clientApplicationEntity) {
+        if(isNull(clientApplicationEntity)) {
+            throw new RentAuthException("Введите данные");
+        }
         ClientApplicationEntity resultNickName = clientRepository.getClientApplicationEntityByNickName(clientApplicationEntity.getNickName());
         if (!isNull(resultNickName)) {
             throw new RentRegistrationException(NICKNAME_IS_TAKEN);

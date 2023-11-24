@@ -16,11 +16,11 @@ public class BookingHistoryEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "apartment_id")
     private ApartmentEntity apartmentEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private ClientApplicationEntity clientApplicationEntity;
 
@@ -45,4 +45,7 @@ public class BookingHistoryEntity {
 
     @Column(name = "scheduler_processing")
     private String schedulerProcessing;
+
+    @Column(name = "scheduler_mail_review")
+    private String schedulerMailReview;
 }

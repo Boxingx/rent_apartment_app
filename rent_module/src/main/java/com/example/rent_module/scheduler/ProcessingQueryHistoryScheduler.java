@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.rent_module.constant_project.ConstantProject.TRUE;
-import static com.example.rent_module.service.RentApartmentServiceImpl.formatter;
 
 @Slf4j
 @Service
@@ -36,9 +35,9 @@ public class ProcessingQueryHistoryScheduler {
      * Метод с шедулером который переодически проверяет активные бронирования, если бронирование уже закончилось он сделает квартиру снова свободной,
      * а так же само бронирование будет закончено.
      */
-    @Scheduled(fixedRate = 35000)
+    @Scheduled(fixedDelay = 35_000)
     public void startProcessingQueryScheduler() {
-        log.info("шедулер начал свою работу " + LocalDateTime.now());
+        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
 
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerProcessingEquals("false");
         for (BookingHistoryEntity e : bookingHistoryEntities) {
@@ -47,7 +46,7 @@ public class ProcessingQueryHistoryScheduler {
                 apartmentRepository.save(e.getApartmentEntity());
                 e.setSchedulerProcessing(TRUE);
                 bookingHistoryRepository.save(e);
-                //TODO по окончании букинга посылать уведомление о том что бы оставили отзыв о квартире с оценкой.
+
                 //TODO может добавить в шедулер высчитывание среднего рейтинга по квартирам
             }
         }
@@ -55,7 +54,7 @@ public class ProcessingQueryHistoryScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void checkTokenScheduler() {
-        log.info("шедулер2 начал свою работу " + LocalDateTime.now());
+        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
         List<ClientApplicationEntity> clientEntities = clientRepository.findClientApplicationEntitiesByUserTokenNotNull();
         for (ClientApplicationEntity c : clientEntities) {
             if (parseTokenValue(c.getUserToken()).isBefore(LocalDateTime.now())) {

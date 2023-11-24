@@ -1,16 +1,10 @@
 package com.example.rent_module.rent_api_test;
 
-import com.example.rent_module.application_exceptions.ApartmentException;
 import com.example.rent_module.integration.GeoCoderRestTemplateManager;
 import com.example.rent_module.integration.YandexWeatherRestTemplateManager;
-import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.PersonsLocation;
-import com.example.rent_module.model.entity.ApartmentEntity;
-import com.example.rent_module.service.RentApartmentService;
-import com.example.rent_module.service.RentApartmentServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static com.example.rent_module.rent_api_test.PrepareObjectToTest.*;
@@ -43,26 +34,6 @@ public class RentControllerTest {
 
     @MockBean
     private YandexWeatherRestTemplateManager yandexWeatherRestTemplateManager;
-
-    @Autowired
-    private RentApartmentService rentApartmentService;
-
-
-//    @Override
-//    public ApartmentWithMessageDto getApartmentById(Long id) {
-//        ApartmentEntity apartmentEntity = apartmentRepository.findById(id).orElseThrow(() -> new ApartmentException(APARTMENT_ERROR));
-//        if (apartmentEntity.getStatus().equals("false")) {
-//            return new ApartmentWithMessageDto(APARTMENT_STATUS_FALSE, applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
-//        }
-//        return new ApartmentWithMessageDto(APARTMENT_STATUS_TRUE, applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
-//    }
-
-    @Test
-    public void getApartmentByIdTest() throws Exception {
-        ApartmentWithMessageDto apartmentById = rentApartmentService.getApartmentById(1l);
-        Assertions.assertNotNull(apartmentById);
-        Assertions.assertEquals("5000", apartmentById.getApartmentDto().getPrice());
-    }
 
 
     /**
@@ -90,7 +61,7 @@ public class RentControllerTest {
      * Тест метода контроллера getApartmentById, передается id который есть в БД и правильный токен.
      * */
     @Test
-    public void findApartmentByParamTest() throws Exception {
+    public void getApartmentByIdTest() throws Exception {
         mockMvc.perform(get(GET_APARTMENT_BY_ID)
                         .param("id", "5")
                         .header("token", "testToken|2030-10-07T12:49:43.641604600"))
@@ -101,12 +72,11 @@ public class RentControllerTest {
     }
 
 
-    //TODO не работает, тк бросает исключение, как быть?
     /**
      * Тест метода контроллера getApartmentById, передается id которого нет в БД и правильный токен
      * */
     @Test
-    public void findApartmentByIdUnknownTest() throws Exception {
+    public void getApartmentByIdNegativeTest() throws Exception {
         mockMvc.perform(get(GET_APARTMENT_BY_ID)
                         .param("id", "20")
                         .header("token", "testToken|2030-10-07T12:49:43.641604600"))
@@ -128,25 +98,6 @@ public class RentControllerTest {
                 .andExpect(jsonPath("$.apartmentDto").isEmpty())
                 .andExpect(status().is(200));
     }
-
-
-//    @GetMapping(GET_APARTMENT_BY_ID)
-//    public ApartmentWithMessageDto getApartmentById(@RequestHeader String token,
-//                                                    @RequestParam Long id,
-//                                                    @RequestParam(required = false) LocalDate start,
-//                                                    @RequestParam(required = false) LocalDate end,
-//                                                    @RequestParam(required = false) String promoCode) {
-//        if (isNull(authService.checkValidToken(token))) {
-//            return new ApartmentWithMessageDto(SIGN_IN, null);
-//        }
-//
-//        if (isNull(start) && isNull(end)) {
-//            return rentApartmentService.getApartmentById(id);
-//        }
-//        if (nonNull(start) && nonNull(end)) {
-//            return rentApartmentService.bookApartment(id, start, end, promoCode, token);
-//        } else return new ApartmentWithMessageDto();
-//    }
 
 
     /**
@@ -173,7 +124,6 @@ public class RentControllerTest {
     }
 
 
-
     /**
      * Тест метода контроллера addNewApartment
      * */
@@ -188,7 +138,6 @@ public class RentControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value(APARTMENT_SAVED))
                 .andExpect(status().is(200));
-
     }
 
 
@@ -201,25 +150,5 @@ public class RentControllerTest {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
-
-//        @PostMapping(ADD_NEW_APARTMENT)
-//        public ApartmentWithMessageDto addNewApartment(@RequestHeader String token,
-//                @RequestBody ApartmentDto apartmentDto) {
-//
-//            if (!authService.checkValidToken(token)) {
-//                return new ApartmentWithMessageDto(SIGN_IN, null);
-//            }
-//
-//            return rentApartmentService.registrationNewApartment(apartmentDto, token);
-//        }
-
-
-
-//    @PostMapping(GET_APARTMENT_BY_LOCATION)
-//    public GetAddressInfoResponseDto getApartmentsByLocation(@Valid @RequestBody PersonsLocation location) {
-//        return rentApartmentService.getApartmentsByLocation(location);
-//    }
-
     }
 }

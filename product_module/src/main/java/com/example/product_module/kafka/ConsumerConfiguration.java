@@ -33,9 +33,10 @@ public class ConsumerConfiguration {
         configurations.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        //Две настройки ниже под вопросом.
+        //настройки ниже под вопросом.
         configurations.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         configurations.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
+        configurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return configurations;
     }
