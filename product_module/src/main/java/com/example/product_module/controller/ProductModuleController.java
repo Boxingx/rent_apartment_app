@@ -20,12 +20,6 @@ public class ProductModuleController {
     private final ProductModuleService productModuleService;
 
 
-    @GetMapping("/product/test")
-    public String testModule(@RequestParam String subject, @RequestParam String text) {
-        mailSender.sendEmail(subject, text, null);
-        String s = "Эта строка получена из другого модуля";
-        return s;
-    }
 
     @GetMapping(ADD_PRODUCT)
     public Double addProductForBooking(@RequestParam Long id, @RequestParam String weather) {
