@@ -16,7 +16,7 @@ public class ProductRestTemplateManager {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String path = "http://localhost:8097/product/add?id=%s&weather=%s";
+        String path = "http://localhost:8098/product/add?id=%s&weather=%s";
             Double body = restTemplate.exchange(String.format(path, id, weather),
                     HttpMethod.GET,
                     new HttpEntity<>(null),
