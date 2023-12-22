@@ -1,15 +1,19 @@
 package com.example.rent_module.scheduler;
 
+import com.example.rent_module.config.CityTranslationStatic;
 import com.example.rent_module.model.entity.BookingHistoryEntity;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
 import com.example.rent_module.repository.ApartmentRepository;
 import com.example.rent_module.repository.BookingHistoryRepository;
 import com.example.rent_module.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +25,8 @@ import static com.example.rent_module.constant_project.ConstantProject.TRUE;
 @EnableScheduling
 @RequiredArgsConstructor
 public class ProcessingQueryHistoryScheduler {
+
+    private final static Logger logger = LoggerFactory.getLogger(ProcessingQueryHistoryScheduler.class);
 
     private final ApartmentRepository apartmentRepository;
 
@@ -37,6 +43,7 @@ public class ProcessingQueryHistoryScheduler {
     public void startProcessingQueryScheduler() {
 //        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
 
+        logger.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerProcessingEquals("false");
         for (BookingHistoryEntity e : bookingHistoryEntities) {
             if (e.getEndDate().isBefore(ChronoLocalDate.from(LocalDateTime.now()))) {
@@ -53,6 +60,7 @@ public class ProcessingQueryHistoryScheduler {
     @Scheduled(fixedRate = 60000)
     public void checkTokenScheduler() {
 //        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
+        logger.info("Токен шедулер начал свою работу " + LocalDateTime.now());
         List<ClientApplicationEntity> clientEntities = clientRepository.findClientApplicationEntitiesByUserTokenNotNull();
         for (ClientApplicationEntity c : clientEntities) {
             if (parseTokenValue(c.getUserToken()).isBefore(LocalDateTime.now())) {
