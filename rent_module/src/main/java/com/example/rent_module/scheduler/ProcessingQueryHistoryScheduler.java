@@ -39,7 +39,7 @@ public class ProcessingQueryHistoryScheduler {
      * Метод с шедулером который переодически проверяет активные бронирования, если бронирование уже закончилось он сделает квартиру снова свободной,
      * а так же само бронирование будет закончено.
      */
-    @Scheduled(fixedDelay = 35_000)
+    @Scheduled(fixedDelay = 40_000)
     public void startProcessingQueryScheduler() {
 //        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
 
@@ -57,7 +57,7 @@ public class ProcessingQueryHistoryScheduler {
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60_000)
     public void checkTokenScheduler() {
 //        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
         logger.info("Токен шедулер начал свою работу " + LocalDateTime.now());

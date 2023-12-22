@@ -8,7 +8,6 @@ import com.example.rent_module.integration.GeoCoderRestTemplateManager;
 import com.example.rent_module.integration.ProductRestTemplateManager;
 import com.example.rent_module.integration.YandexWeatherRestTemplateManager;
 import com.example.rent_module.kafka.KafkaProducer;
-import com.example.rent_module.kafka.KafkaProducerImpl;
 import com.example.rent_module.mapper.ApplicationMapper;
 import com.example.rent_module.model.dto.*;
 import com.example.rent_module.model.dto.geocoder_city_to_location.Geometry;
@@ -250,6 +249,7 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     @Override
     public ApartmentWithMessageDto registrationNewApartment(ApartmentDto apartmentDto, String token) {
+        //todo добавить проверку если commertial status true у того кто регистрирует квартиру.
         ClientApplicationEntity client = clientRepository.findClientApplicationEntitiesByUserToken(token);
         ApartmentEntity apartmentEntity = applicationMapper.apartmentDtoToApartmentEntity(apartmentDto);
         apartmentEntity.setRegistrationDate(LocalDateTime.now().format(formatter));
