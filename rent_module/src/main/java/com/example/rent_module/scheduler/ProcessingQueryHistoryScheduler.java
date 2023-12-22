@@ -1,11 +1,16 @@
 package com.example.rent_module.scheduler;
 
+import com.example.rent_module.application_exceptions.ApartmentException;
+import com.example.rent_module.application_exceptions.RatingException;
 import com.example.rent_module.config.CityTranslationStatic;
+import com.example.rent_module.model.entity.ApartmentEntity;
 import com.example.rent_module.model.entity.BookingHistoryEntity;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
+import com.example.rent_module.model.entity.RatingEntity;
 import com.example.rent_module.repository.ApartmentRepository;
 import com.example.rent_module.repository.BookingHistoryRepository;
 import com.example.rent_module.repository.ClientRepository;
+import com.example.rent_module.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +22,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.rent_module.constant_project.ConstantProject.TRUE;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Service
 @EnableScheduling
@@ -33,6 +41,8 @@ public class ProcessingQueryHistoryScheduler {
     private final BookingHistoryRepository bookingHistoryRepository;
 
     private final ClientRepository clientRepository;
+
+    private final RatingRepository ratingRepository;
 
     public static DateTimeFormatter authFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS");
     /**
@@ -67,6 +77,29 @@ public class ProcessingQueryHistoryScheduler {
                 c.setUserToken(null);
                 clientRepository.save(c);
             }
+        }
+    }
+
+    /**
+     * Шедулер каждый час высчитыват средний рейтинг по квартирам.
+     * */
+    @Scheduled(fixedRate = 3_600_000)
+    public void calculateAvgRatings() {
+
+        List<RatingEntity> allRatingsEntities = ratingRepository.getAllRatings();
+        if (isNull(allRatingsEntities)) {
+            throw new RatingException("Не найдены квартиры для подсчета рейтингов");
+        }
+
+        Map<Long, Double> map = allRatingsEntities.stream().collect(Collectors.groupingBy(
+                ratingEntity -> ratingEntity.getApartmentEntity().getId(), Collectors.averagingDouble(RatingEntity::getRating)));
+
+        for(Map.Entry<Long, Double> entry : map.entrySet() ) {
+            ApartmentEntity apartmentEntityById = apartmentRepository.getApartmentEntityById(entry.getKey());
+            if (isNull(apartmentEntityById)) {
+                throw new ApartmentException("Апартаметы для посчета рейтинга не найдены");
+            }
+            apartmentEntityById.setAverageRating(Double.toString(entry.getValue()));
         }
     }
 
