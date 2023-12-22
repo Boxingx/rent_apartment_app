@@ -4,7 +4,6 @@ import com.example.product_module.email_sender.MailSender;
 import com.example.product_module.entity.BookingHistoryEntity;
 import com.example.product_module.repository.BookingHistoryRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 
 @Service
-@Slf4j
+
 @EnableScheduling
 @RequiredArgsConstructor
 public class MailReviewScheduler {
@@ -25,7 +24,7 @@ public class MailReviewScheduler {
 
     @Scheduled(fixedDelay = 35_000)
     public void sendMailAfterBooking() {
-        log.info("Мэйл шедулер начал свою работу");
+//        log.info("Мэйл шедулер начал свою работу");
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerMailReviewEquals("false");
         for(BookingHistoryEntity e : bookingHistoryEntities) {
             if (e.getEndDate().isBefore(ChronoLocalDate.from(LocalDateTime.now()))) {

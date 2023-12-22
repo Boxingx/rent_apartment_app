@@ -3,13 +3,15 @@ package com.example.rent_module.service;
 import com.example.rent_module.model.entity.BookingHistoryEntity;
 import com.example.rent_module.repository.BookingHistoryRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,7 +20,6 @@ import static java.util.Objects.nonNull;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ReportServiceImpl implements ReportService {
 
     private final BookingHistoryRepository bookingHistoryRepository;
@@ -34,7 +35,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void report(List<BookingHistoryEntity> bookingHistoryEntities) {
-        log.info("Старт выгрузки отчета");
+//        log.info("Старт выгрузки отчета");
         File template = new File("C:\\Users\\Alex\\IdeaProjects\\rent_apartment_app\\report_template.xlsx");
         try(FileInputStream fileInputStream = new FileInputStream(template);
             XSSFWorkbook book = new XSSFWorkbook(fileInputStream)) {
@@ -60,7 +61,7 @@ public class ReportServiceImpl implements ReportService {
             book.write(fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            log.info("Отчет выгружен");
+//            log.info("Отчет выгружен");
         } catch (IOException e) {
             e.printStackTrace();
         }

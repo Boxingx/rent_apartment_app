@@ -6,7 +6,6 @@ import com.example.rent_module.repository.ApartmentRepository;
 import com.example.rent_module.repository.BookingHistoryRepository;
 import com.example.rent_module.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.util.List;
 
 import static com.example.rent_module.constant_project.ConstantProject.TRUE;
 
-@Slf4j
 @Service
 @EnableScheduling
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class ProcessingQueryHistoryScheduler {
      */
     @Scheduled(fixedDelay = 35_000)
     public void startProcessingQueryScheduler() {
-        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
+//        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
 
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerProcessingEquals("false");
         for (BookingHistoryEntity e : bookingHistoryEntities) {
@@ -54,7 +52,7 @@ public class ProcessingQueryHistoryScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void checkTokenScheduler() {
-        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
+//        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
         List<ClientApplicationEntity> clientEntities = clientRepository.findClientApplicationEntitiesByUserTokenNotNull();
         for (ClientApplicationEntity c : clientEntities) {
             if (parseTokenValue(c.getUserToken()).isBefore(LocalDateTime.now())) {

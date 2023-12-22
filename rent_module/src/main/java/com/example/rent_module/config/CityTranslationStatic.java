@@ -3,6 +3,10 @@ package com.example.rent_module.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import static com.example.rent_module.constant_project.ConstantProject.NOT_HAVE_APARTMENT_IN_THIS_CITY;
 
 
@@ -11,10 +15,13 @@ import static com.example.rent_module.constant_project.ConstantProject.NOT_HAVE_
  * */
 public class CityTranslationStatic {
 
+    private final static Logger logger = LoggerFactory.getLogger(CityTranslationStatic.class);
     private static final Map<String, String> cityTranslationMap = new HashMap<>();
     private static final Map<String, String> cityCountryMap = new HashMap<>();
 
     static {
+
+        logger.info("start init map");
         cityTranslationMap.put("Moscow", "Москва");
         cityTranslationMap.put("Saint Petersburg", "Санкт-Петербург");
         cityTranslationMap.put("Omsk", "Омск");
@@ -25,6 +32,7 @@ public class CityTranslationStatic {
         cityTranslationMap.put("Makhachkala", "Махачкала");
         cityTranslationMap.put("Penza", "Пенза");
         cityTranslationMap.put("Tver", "Тверь");
+        logger.info("end init map");
     }
 
     static {
