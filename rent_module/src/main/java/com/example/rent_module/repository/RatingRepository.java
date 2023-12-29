@@ -13,6 +13,6 @@ import java.util.List;
 public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
     List<RatingEntity> getRatingEntitiesByApartmentEntity(ApartmentEntity apartmentEntity);
 
-    @Query(nativeQuery = true, value = "Select rating, apartment_id from rating_apartment_info")
-    List<RatingEntity> getAllRatings();
+    @Query(value = "select r from RatingEntity r")
+    List<RatingEntity> findAllRatings();
 }

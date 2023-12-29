@@ -83,10 +83,12 @@ public class ProcessingQueryHistoryScheduler {
     /**
      * Шедулер каждый час высчитыват средний рейтинг по квартирам.
      * */
-    @Scheduled(fixedRate = 3_600_000)
+    @Scheduled(fixedDelay = 30_000)
+    //(fixedRate = 3_600_000)
     public void calculateAvgRatings() {
 
-        List<RatingEntity> allRatingsEntities = ratingRepository.getAllRatings();
+        logger.info("Рейтинг шедуллер начал свою работу");
+        List<RatingEntity> allRatingsEntities = ratingRepository.findAllRatings();
         if (isNull(allRatingsEntities)) {
             throw new RatingException("Не найдены квартиры для подсчета рейтингов");
         }
@@ -96,6 +98,8 @@ public class ProcessingQueryHistoryScheduler {
 
         for(Map.Entry<Long, Double> entry : map.entrySet() ) {
             ApartmentEntity apartmentEntityById = apartmentRepository.getApartmentEntityById(entry.getKey());
+            apartmentEntityById.setAverageRating(entry.getValue().toString());
+            apartmentRepository.save(apartmentEntityById);
             if (isNull(apartmentEntityById)) {
                 throw new ApartmentException("Апартаметы для посчета рейтинга не найдены");
             }
