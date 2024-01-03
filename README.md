@@ -2,4 +2,4 @@
 
 Приложение представляет собой Rest API с микросервисной архитектурой на базе Spring Boot, версия 3.1.3. Микросервисы зарегистрированы на Eureka Server(модуль - server_module), маршрутизация запросов производится через API Gateway(модуль proxy_module), в связи с этим остальные модули используют нулевые порты. Взаимодействие между микросервисами происходит с помощью RestTemplate, а также используется реляционная база данных Postgres. Начальная информация вносится в базу данных через SQL скрипты с помощью Flyway migration. Маппинг полей между Entity и DTO происходит с помощью mapstruct, также в микросервисах написани unit тесты.
 
-![add_photo_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/70cc8357-0d77-45ea-8e93-71866223a30a)
+![add_photo](https://github.com/Boxingx/rent_apartment_app/assets/130319720/70cc8357-0d77-45ea-8e93-71866223a30a)
