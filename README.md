@@ -12,7 +12,7 @@
 
 Процесс работы приложения состоит из нескольких этапов.
 1-ЭТАП - регистрация нового пользователя
-!(https://github.com/Boxingx/rent_apartment_app/assets/130319720/cda6a804-d0f7-47c9-a929-e3829ebe9508)
+![reg_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f86dd16c-3e65-4881-9b02-23c659d7d730)
 
 
 
