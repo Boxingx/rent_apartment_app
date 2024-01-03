@@ -87,6 +87,39 @@
 ![15review_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/eac6119e-3f5e-4680-8502-e13d845f46ee)
 
 
+Данные которые хранятся в БД
+
+Таблица квартир
+
+![apt_db](https://github.com/Boxingx/rent_apartment_app/assets/130319720/dd88df12-7ad2-45dc-8aed-b18d525594fb)
+
+Таблица пользователей
+
+![users_db](https://github.com/Boxingx/rent_apartment_app/assets/130319720/e96d2d51-bbd8-487e-aaf1-85d18fb8ae54)
+
+Таблица бронирований
+
+![booking_history](https://github.com/Boxingx/rent_apartment_app/assets/130319720/73fc7498-eb70-4a36-8824-e9f67dd18814)
+
+Таблица скидок
+
+![product_db](https://github.com/Boxingx/rent_apartment_app/assets/130319720/9c972c4c-c4b9-4060-936a-24c3587f175b)
+
+Таблица отзывов
+
+![ratings_db](https://github.com/Boxingx/rent_apartment_app/assets/130319720/098a1dc3-7428-4e91-8295-21cbe2a58bc2)
+
+
+EUREKA DASHBOARD SCREENSHOT
+
+![eureka](https://github.com/Boxingx/rent_apartment_app/assets/130319720/eb403003-03c3-43ce-98fd-afc12926ce11)
+
+
+
+
+
+
+
 
 
 
