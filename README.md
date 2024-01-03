@@ -16,6 +16,7 @@
 
 Регистрация арендодателя
 ![регистрация арендодателя](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f86dd16c-3e65-4881-9b02-23c659d7d730)
+![1reg_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/dc1086d9-9566-4c50-9dd3-b35972c36eac)
 
 Регистрация арендатора
 ![регистрация арендатора](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f12cafdc-0c12-4088-a32c-49cd9c5899de)
