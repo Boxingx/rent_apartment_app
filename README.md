@@ -15,65 +15,77 @@
 1 ЭТАП - регистрация пользователей, после которой пользователь получает временный токен.
 
 Регистрация арендодателя
-![регистрация арендодателя](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f86dd16c-3e65-4881-9b02-23c659d7d730)
-![1reg_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/dc1086d9-9566-4c50-9dd3-b35972c36eac)
+
+![1reg_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/73d751a2-318c-4dee-abcb-c60f1336d71d)
 
 Регистрация арендатора
-![регистрация арендатора](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f12cafdc-0c12-4088-a32c-49cd9c5899de)
+
+![2reg_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/27b384a5-46fc-48d7-9706-d0fe12f8842b)
 
 Если такой пользователь уже существует получим сообщение об этом.
-![если такой пользователь уже существует](https://github.com/Boxingx/rent_apartment_app/assets/130319720/35a2e2d2-f94c-41ce-92bf-2e0dc942ba6e)
+
+![3wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/e6ca6600-361b-42c9-8713-1f315dda1877)
 
 2 ЭТАП - аутентификация пользователей
 
 Аутентификация арендатора
-![4auth_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/27af5f45-1aab-41e4-b89b-d59ebe1eed68)
+
+![4auth_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/21b5b8a0-f587-4a8a-948e-01306ccb3cad)
+
 
 Аутентификация арендатора
-![5auth_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/fedd1ee8-7e93-469d-84a3-75cd28424849)
+
+![5auth_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/e8b259a7-d145-4de9-b7a4-69f90da25bc4)
+
 
 3 ЭТАП - арендодатель добавляет квартиру которую хочет сдать в аренду
 
-![6reg_new_apt_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/d835e2f2-e6c4-4472-b53f-7d3032726362)
-
+![6reg_new_apt_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/40170dc6-0c38-4f78-97a6-1d494f9b1657)
 
 4 ЭТАП - арендодатель добавляет фотографии к квартире, которую сдает в аренду
 
 Можно добавить до 5 фото, с ограниченным размером
-![7add_photo_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/84592a0c-0f89-4de1-be22-a011dfadf533)
+
+![7add_photo_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/4a27e078-9748-47d5-8c46-ff603339d671)
 
 5 ЭТАП - выгрузка квартир по определенным фильтрам, либо по локации
 
 Фильруем квартиры по подходящим нам параметрам
-![8apt_list1](https://github.com/Boxingx/rent_apartment_app/assets/130319720/80c001df-c543-4a05-84ae-8e23a3ef3696)
+
+![8apt_list1](https://github.com/Boxingx/rent_apartment_app/assets/130319720/c6e28921-f6aa-4006-a1a1-4b79ccc4868d)
 
 Получаем такой ответ после выгрузки по определенным фильтрам
 
-![9apt_list2](https://github.com/Boxingx/rent_apartment_app/assets/130319720/d4d95dea-a1ee-47c1-b40d-e6e7b4d3929a)
+![9apt_list2](https://github.com/Boxingx/rent_apartment_app/assets/130319720/91a914ba-d365-4d0f-ab03-ebf10de200e1)
 
 Для выгрузки квартир по локации просто передаем широту и долготу
-![10location1](https://github.com/Boxingx/rent_apartment_app/assets/130319720/efb2f121-6863-4088-b2fd-a9770c9212a1)
+
+![10location1](https://github.com/Boxingx/rent_apartment_app/assets/130319720/10d76e37-915a-4176-8267-a0596e97232f)
 
 Получаем такой ответ после выгрузки по локации
 
-![11location2](https://github.com/Boxingx/rent_apartment_app/assets/130319720/48d1159f-3f20-4827-86b6-4337f5e3720b)
+![11location2](https://github.com/Boxingx/rent_apartment_app/assets/130319720/d753a21f-de02-4e16-9056-b0a7191afe25)
 
 6 ЭТАП - бронирование подходящих апартаментов
 
 Так выглядит запрос для бронирования
-![12book_apt_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/7bc65bdf-e6f3-44bb-953a-1a8a62a81fee)
+
+![12book_apt_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/b5b7b395-d54c-4597-9d6a-2251bafcff01)
 
 7 ЭТАП - получение уведомления о бронировании на электронную почту
 
 После бронирования сразу получаем об этом письмо на почту
-![13book_mail_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f990a882-157e-4f30-a69b-e3f19a848b3e)
+
+![13book_mail_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/6acb7896-57f8-483d-8795-2d1dcae29b9e)
 
 8 ЭТАП - получение электронного сообщения по окончании бронирования с просьбой оставить отзыв
 
-![14review_mail_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/ef89c6c3-ea86-4951-bbd0-b903459f7930)
+![14review_mail_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/aac95def-426d-408e-a85b-b874a048c092)
 
 Оставляем отзыв
-![15review_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/a3c69053-7675-47fc-99a2-2f9215f065a3)
+
+![15review_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/eac6119e-3f5e-4680-8502-e13d845f46ee)
+
 
 
 
