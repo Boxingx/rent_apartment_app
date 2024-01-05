@@ -41,7 +41,7 @@
 
 При неверном пароле получаем уведомление 
 
-![wrong_pass](https://github.com/Boxingx/rent_apartment_app/assets/130319720/a89c86ad-4631-48c3-9e54-0b85e519b705)
+![wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/2f9c30e4-9079-4bd6-9a7f-72f71ac19b5a)
 
 
 3 ЭТАП - арендодатель добавляет квартиру которую хочет сдать в аренду
