@@ -20,7 +20,8 @@
 
 Регистрация арендатора
 
-![2reg_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/27b384a5-46fc-48d7-9706-d0fe12f8842b)
+![reg_ivan](https://github.com/Boxingx/rent_apartment_app/assets/130319720/dc75424a-5a9d-4912-b91a-c96f8eeb0772)
+
 
 Если такой пользователь уже существует получим сообщение об этом.
 
