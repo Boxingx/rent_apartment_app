@@ -24,7 +24,6 @@ public class MailReviewScheduler {
 
     @Scheduled(fixedDelay = 35_000)
     public void sendMailAfterBooking() {
-//        log.info("Мэйл шедулер начал свою работу");
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerMailReviewEquals("false");
         for(BookingHistoryEntity e : bookingHistoryEntities) {
             if (e.getEndDate().isBefore(ChronoLocalDate.from(LocalDateTime.now()))) {
@@ -39,7 +38,6 @@ public class MailReviewScheduler {
 
                 e.setSchedulerMailReview("true");
                 bookingHistoryRepository.save(e);
-                //todo правильно ли передаю ссылку в письме или можно как то улучишить
             }
         }
     }

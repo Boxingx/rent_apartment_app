@@ -33,29 +33,14 @@ public class MailSender {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
             helper.setFrom("barik.alex95@yandex.ru");
             helper.setTo(sendTo);
             helper.setSubject(sendSubject);
-
-//            String htmlText = "<html><body>" +
-//                    "<p>" + text + "</p>" +
-//                    "<p>Ваша квартира:</p>" +
-//                    "<img src='cid:example0'><br>" +
-//                    "<img src='cid:example1'><br>" +
-//                    "<img src='cid:example2'><br>" +
-//                    "<img src='cid:example3'><br>" +
-//                    "<img src='cid:example4'><br>" +
-//                    "</body></html>";
-
             helper.setText(text);
 
-//            helper.addInline("example0", new ClassPathResource(new String(imageBytes.get(0))));
-//            helper.addInline("example1", new ClassPathResource(new String(imageBytes.get(1))));
             int i = 0;
-            // Прикрепляем изображение
             for (byte[] p : imageBytes) {
                 helper.addAttachment("example" + i + ".jpg", new ByteArrayResource(p));
                 i++;
@@ -65,7 +50,6 @@ public class MailSender {
             e.printStackTrace();
         }
     }
-
 
 
     public void sendEmailWithImage(String sendSubject, String text, String sendTo, byte[] imageBytes) {
@@ -78,8 +62,6 @@ public class MailSender {
             helper.setTo(sendTo);
             helper.setSubject(sendSubject);
             helper.setText(text);
-
-            // Прикрепляем изображение
             helper.addAttachment("example", new ByteArrayResource(imageBytes));
 
             javaMailSender.send(mimeMessage);

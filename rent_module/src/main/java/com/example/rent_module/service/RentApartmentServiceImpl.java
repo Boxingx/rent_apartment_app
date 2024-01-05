@@ -111,41 +111,12 @@ public class RentApartmentServiceImpl implements RentApartmentService {
     }
 
 
-    //TODO Метод не используется потому что заменили на другой который еще не доделан(нужно дописать что бы возвращал квартиры ниже указанной цены, а не только по указанной цене), т.к. прошлый метод не дописан этот оставил.
-    public GetAddressInfoResponseDto getApartmentByPrice(Long price) {
-        List<ApartmentEntity> apartmentEntityList = apartmentRepository.getApartmentInfo(price);
-        if (apartmentEntityList.isEmpty()) {
-            GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
-            getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
-            getAddressInfoResponseDto.setExceptionMessage(NO_APT_WITH_THIS_PRICE + price);
-
-            return getAddressInfoResponseDto;
-        }
-        return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntityList));
-    }
-
-
     public GetAddressInfoResponseDto getApartmentByCityAndRoomsCount(String city, String roomsCount) {
         List<ApartmentEntity> apartmentEntityList = apartmentRepository.findApartmentEntitiesByRoomsCountAndAddressEntity_City(roomsCount, city);
         if (apartmentEntityList.isEmpty()) {
             GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
             getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
             getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + ROOMS_COUNT + roomsCount);
-
-            return getAddressInfoResponseDto;
-        }
-        return new GetAddressInfoResponseDto(apartmentEntityToDto(apartmentEntityList));
-    }
-
-
-    @Override
-    public GetAddressInfoResponseDto getApartmentByCityAndPrice(String city, String price) {
-        //TODO сделать что бы выгрузка было по цене меньше или сделать 2 принимаемых значения с ценой от и до.
-        List<ApartmentEntity> apartmentEntityList = apartmentRepository.findApartmentEntitiesByPriceAndAddressEntity_City(price, city);
-        if (apartmentEntityList.isEmpty()) {
-            GetAddressInfoResponseDto getAddressInfoResponseDto = new GetAddressInfoResponseDto(null);
-            getAddressInfoResponseDto.setExceptionCode(ERROR_CODE_255);
-            getAddressInfoResponseDto.setExceptionMessage(NO_APARTMENT_IN_CITY_AND + city + WITH_PRICE + price);
 
             return getAddressInfoResponseDto;
         }
@@ -222,16 +193,10 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         YandexWeatherResponse weather = yandexWeatherRestTemplateManager.getWeatherByLocation(location);
         String infoByLocation = restTemplateManager.getInfoByLocation(location); //ТУТ СОДЕРЖИТСЯ ГОРОД НА АНГЛИЙСКОМ
 
-        //String englishCity = parseLocationInfo(infoByLocation);
-
         GetAddressInfoResponseDto addressByCity = getAddressByCity(getCityInRussianLanguage(infoByLocation));
 
         addressByCity.setTemp(weather.getFactWeather().getTemp());
         addressByCity.setCondition(weather.getFactWeather().getCondition());
-
-        //TODO Временно для тестов
-//        addressByCity.setTemp("27");
-//        addressByCity.setCondition("облачно");
 
         return addressByCity;
     }
@@ -249,8 +214,10 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
     @Override
     public ApartmentWithMessageDto registrationNewApartment(ApartmentDto apartmentDto, String token) {
-        //todo добавить проверку если commertial status true у того кто регистрирует квартиру.
         ClientApplicationEntity client = clientRepository.findClientApplicationEntitiesByUserToken(token);
+        if(!client.isCommercialStatus()) {
+            throw new ApartmentException("Регистрация новых квартир доступна только аккаунтам с коммерческим статусом.");
+        }
         ApartmentEntity apartmentEntity = applicationMapper.apartmentDtoToApartmentEntity(apartmentDto);
         apartmentEntity.setRegistrationDate(LocalDateTime.now().format(formatter));
         apartmentEntity.setClientApplicationEntity(client);
@@ -303,17 +270,17 @@ public class RentApartmentServiceImpl implements RentApartmentService {
 
         Geometry locationByCity = restTemplateManager.getLocationByCity(englishCity, englishCountry);
 
-        //TODO временно
-//        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByCoordinates(locationByCity.getLatitude(), locationByCity.getLongitude());
+        String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByCoordinates(locationByCity.getLatitude(), locationByCity.getLongitude());
 
-
-        //TODO погода null временно для тестов
         try {
-            finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), null);
+            finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), weatherByLocation);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
 
         } catch (Exception e) {
-            //TODO тут пишем в топик, и сообщаем пользователю что серсис расчета скидки в данный момент недоступен, но как только он возобновит свою работу пользователь получит сообщение на почту с уже расчитаной скидкой и ссылкой на оплату.
+            /**
+             *  Тут пишем в топик, и сообщаем пользователю, что серсис расчета скидки в данный момент недоступен, но как только он
+             *  возобновит свою работу пользователь получит сообщение на почту с уже расчитаной скидкой и ссылкой на оплату.
+             *  */
             kafkaProducer.sendMessageToTopic(bookingHistoryEntity.getId().toString());
             throw new BookApartmentException(prepareBookingResponse(start, end, false, null), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }
@@ -338,7 +305,6 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         if (!checkPhotoSize(multipartFile)) {
             throw new PhotoException(PHOTO_SIZE_ERROR);
         }
-        //TODO реализовать проверку на размер фото,реализовал, но видимо у сервера свои ограничения на 1 мб и какой ответ отдавать на фронт если не прошла проверку,тк сейчас ответ летит только в стектрейс
         List<PhotoEntity> entityList = photoRepository.findPhotoEntitiesByApartmentEntity(id);
         int count = entityList.size();
         checkPhotoCount(count);

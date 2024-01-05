@@ -20,7 +20,6 @@ public class ProductModuleController {
     private final ProductModuleService productModuleService;
 
 
-
     @GetMapping(ADD_PRODUCT)
     public Double addProductForBooking(@RequestParam Long id, @RequestParam String weather) {
         return productModuleService.prepareProduct(id, weather);

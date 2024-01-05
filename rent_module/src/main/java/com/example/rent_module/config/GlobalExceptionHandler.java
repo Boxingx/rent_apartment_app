@@ -58,5 +58,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBindException(RatingException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
-    //HttpClientErrorException$BadRequest
+
 }

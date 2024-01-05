@@ -24,8 +24,6 @@ public class BookingHistoryEntity {
     @JoinColumn(name = "client_id")
     private ClientApplicationEntity clientApplicationEntity;
 
-
-    //TODO наверное менять LocalDate на LocalDateTime
     @Column(name = "start_date")
     private LocalDate startDate;
 

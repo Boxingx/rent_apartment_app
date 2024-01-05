@@ -3,10 +3,6 @@ package com.example.rent_module.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import static com.example.rent_module.constant_project.ConstantProject.NOT_HAVE_APARTMENT_IN_THIS_CITY;
 
 
@@ -53,7 +49,7 @@ public class CityTranslationStatic {
                 return entry.getKey();
             }
         }
-        return null;  // Если значение не найдено
+        return null;
     }
 
     /**Метод принимает город на русском языке и возвращает на английском, проходится по мапе cityTranslationMap */

@@ -44,7 +44,7 @@ public class AuthServiceTest {
 
 
 
-    //todo не работает не пойму как сделать так что я жду наш Exception , в итоге вроде сделал через аннотацию @Test(expected = RentAuthException.class)
+    //todo test не работает не пойму как сделать так что я жду наш Exception , в итоге вроде сделал через аннотацию @Test(expected = RentAuthException.class)
     @Test(expected = RentAuthException.class)
     public void registrationNegativeTest() {
         ClientApplicationEntity clientApplicationEntity = null;

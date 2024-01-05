@@ -8,12 +8,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ProductExceptionHandler {
 
-
     @ExceptionHandler(BookingHistoryException.class)
     public ResponseEntity<?> handleBindException(BookingHistoryException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getBOOKING_EXCEPTION_MESSAGE());
     }
 
-
-    //HttpClientErrorException$BadRequest
 }

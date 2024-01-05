@@ -4,14 +4,11 @@ package com.example.rent_module.service;
 import com.example.rent_module.application_exceptions.RentAuthException;
 import com.example.rent_module.application_exceptions.RentRegistrationException;
 import com.example.rent_module.config.AuthToken;
-import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.AuthDto;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
 import com.example.rent_module.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 import static com.example.rent_module.base64.ApplicationEncoderDecoder.decode;
 import static com.example.rent_module.base64.ApplicationEncoderDecoder.encode;
@@ -26,7 +23,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final ClientRepository clientRepository;
 
-//    private final UserSession userSession;
 
     /**
      * Метод регистрации, проверки занят ли никнейм или почтовый адрес, если нет то кодируется пароль и сохраняется в БД вся сущность

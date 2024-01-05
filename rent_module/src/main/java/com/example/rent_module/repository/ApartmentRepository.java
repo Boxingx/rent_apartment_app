@@ -1,6 +1,5 @@
 package com.example.rent_module.repository;
 
-import com.example.rent_module.model.dto.GetAddressInfoResponseDto;
 import com.example.rent_module.model.entity.ApartmentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long> {
-
 
 
     @Query(nativeQuery = true, value = "SELECT * FROM apartment_info WHERE CAST(price AS bigint) <= :price")

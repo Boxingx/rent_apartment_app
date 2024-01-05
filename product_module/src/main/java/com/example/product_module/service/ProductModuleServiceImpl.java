@@ -83,14 +83,6 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                             break;
                         }
                     }
-                    //TODO не рабочий, не дописан. Сделать скидку не в процентах, а сумма(например 200руб), плюс подобавлять везде проверки, в процентах ли скидка или сумма.
-                    /**Скидка 10% если пользователь зарегистрировался по реферальной ссылке,хранится 3 месяца*/
-                    if (p.getId() == 7l) {
-                        if (clientApplicationEntity.getParentCity().equals(apartmentEntity.getAddressEntity().getCity())) {
-                            saveProductToBookingHistory(p, history);
-                            break;
-                        }
-                    }
                     /**Скидка 5% если пользователь арендовал квартиру на 5 или больше дней*/
                     if (p.getId() == 5l) {
                         if (history.getDaysCount() >= 5) {
@@ -129,7 +121,7 @@ public class ProductModuleServiceImpl implements ProductModuleService {
                     " дней проживания, составил " + history.getFinalPayment() +
                     " вам была предоставлена скидка " + history.getProductEntity().getProductName() +
                     " которая составляет " + history.getProductEntity().getDiscount() +
-                    " процентов. Погода на момент вашего заезда " + weather, //TODO погода просто в данный момент, а не в момент заезда, что с этим делать?
+                    " процентов. Погода на момент вашего заезда " + weather,
                     history.getClientApplicationEntity().getLoginMail(), photos);
 
             return finalPayment;

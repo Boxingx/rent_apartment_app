@@ -44,14 +44,6 @@ public class RentApartmentController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @GetMapping("/testtesttest") //todo удалить
-    public List<RatingEntity> getFullRating() {
-
-        String query = "INSERT INTO rating_apartment_info(id) values (50)";
-        jdbcTemplate.execute(query);
-        return null;
-    }
-
     @GetMapping("/testtest")
     public String testKafka(String mes) {
         return kafkaProducer.sendMessageToTopic(mes);
@@ -136,8 +128,6 @@ public class RentApartmentController {
         } else return new ApartmentWithMessageDto();
     }
 
-
-    //TODO наверное также в этом методе нужно сохранять владельца, т.е тот кто квартиру регистрирует, помимо этого нет адреса, нужно разобраться как передавать адрес.
 
     /**
      * Метод позволяет добавить новые квартиры

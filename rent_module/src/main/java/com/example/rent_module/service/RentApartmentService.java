@@ -6,7 +6,6 @@ import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.GetAddressInfoResponseDto;
 import com.example.rent_module.model.dto.PersonsLocation;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -15,11 +14,7 @@ public interface RentApartmentService {
 
     GetAddressInfoResponseDto getAddressByCity(String cityName);
 
-    GetAddressInfoResponseDto getApartmentByPrice(Long price);
-
     GetAddressInfoResponseDto getApartmentByCityAndRoomsCount(String city, String roomsCount);
-
-    GetAddressInfoResponseDto getApartmentByCityAndPrice(String city, String price);
 
     GetAddressInfoResponseDto getApartmentByCityAndPriceAndRoomsCount(String city, String priceTo, String roomsCount);
 

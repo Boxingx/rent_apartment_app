@@ -2,7 +2,6 @@ package com.example.rent_module.scheduler;
 
 import com.example.rent_module.application_exceptions.ApartmentException;
 import com.example.rent_module.application_exceptions.RatingException;
-import com.example.rent_module.config.CityTranslationStatic;
 import com.example.rent_module.model.entity.ApartmentEntity;
 import com.example.rent_module.model.entity.BookingHistoryEntity;
 import com.example.rent_module.model.entity.ClientApplicationEntity;
@@ -18,16 +17,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.example.rent_module.constant_project.ConstantProject.TRUE;
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @Service
 @EnableScheduling
@@ -61,8 +59,6 @@ public class ProcessingQueryHistoryScheduler {
                 apartmentRepository.save(e.getApartmentEntity());
                 e.setSchedulerProcessing(TRUE);
                 bookingHistoryRepository.save(e);
-
-                //TODO может добавить в шедулер высчитывание среднего рейтинга по квартирам
             }
         }
     }

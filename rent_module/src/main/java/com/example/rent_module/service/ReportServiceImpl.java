@@ -31,7 +31,7 @@ public class ReportServiceImpl implements ReportService {
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesByStartDateBetween(startDate,
                 prepareDate(null, null, startDate));
         report(bookingHistoryEntities);
-        return "123";
+        return " ";
     }
 
     private void report(List<BookingHistoryEntity> bookingHistoryEntities) {

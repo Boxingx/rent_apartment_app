@@ -20,7 +20,7 @@ public class PrepareObjectToTest {
         return new YandexWeatherResponse(new FactWeather("10", "clear"));
     }
 
-    //TODO нормально ли то что я так указал адрес?
+    //TODO test нормально ли то что я так указал адрес?
     public static ApartmentDto prepareApartmentDtoForTest() {
         return new ApartmentDto("8", "5", "9999", "true", "123", new AddressDto());
     }
