@@ -25,7 +25,8 @@
 
 Если такой пользователь уже существует получим сообщение об этом.
 
-![3wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/e6ca6600-361b-42c9-8713-1f315dda1877)
+![wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/f9306afd-e4b3-4a5e-8999-dbbf0477754c)
+
 
 2 ЭТАП - аутентификация пользователей
 
