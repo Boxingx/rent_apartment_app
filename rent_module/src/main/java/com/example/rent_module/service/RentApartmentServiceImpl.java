@@ -19,6 +19,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -77,6 +79,8 @@ public class RentApartmentServiceImpl implements RentApartmentService {
     private final KafkaProducer kafkaProducer;
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    private final static Logger logger = LoggerFactory.getLogger(RentApartmentServiceImpl.class);
 
 
     //QUERY WITH CRITERIA API
@@ -273,7 +277,11 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         String weatherByLocation = yandexWeatherRestTemplateManager.getWeatherByCoordinates(locationByCity.getLatitude(), locationByCity.getLongitude());
 
         try {
+            logger.info("Класс RentApartmentServiceImpl метод bookApartment начал выполнение запроса на productRestTemplateManager.prepareProduct id ={}, weatherByLocation={}",
+                    bookingHistoryEntity.getId(), weatherByLocation);
             finalPayment = productRestTemplateManager.prepareProduct(bookingHistoryEntity.getId(), weatherByLocation);
+            logger.info("Класс RentApartmentServiceImpl метод bookApartment  успешно выполнил запрос на productRestTemplateManager.prepareProduct id ={}, weatherByLocation={}",
+                    bookingHistoryEntity.getId(), weatherByLocation);
             return new ApartmentWithMessageDto(prepareBookingResponse(start, end, true, finalPayment), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
 
         } catch (Exception e) {
@@ -281,6 +289,9 @@ public class RentApartmentServiceImpl implements RentApartmentService {
              *  Тут пишем в топик, и сообщаем пользователю, что серсис расчета скидки в данный момент недоступен, но как только он
              *  возобновит свою работу пользователь получит сообщение на почту с уже расчитаной скидкой и ссылкой на оплату.
              *  */
+            logger.error("Класс RentApartmentServiceImpl метод bookApartment получил ошибку при выполнении запроса на product_module, и оставил данное сообщение в " +
+                    "кафка топик. Сообщение : {}", bookingHistoryEntity.getId().toString());
+
             kafkaProducer.sendMessageToTopic(bookingHistoryEntity.getId().toString());
             throw new BookApartmentException(prepareBookingResponse(start, end, false, null), applicationMapper.apartmentEntityToApartmentDto(apartmentEntity));
         }
@@ -312,12 +323,14 @@ public class RentApartmentServiceImpl implements RentApartmentService {
         PhotoEntity photoEntity = new PhotoEntity();
         photoEntity.setApartmentEntity(apartmentEntityById);
         try {
+            logger.info("Класс RentApartmentServiceImpl метод addPhoto начал сохранение фотографии в базу данных для квартиры с id:{}", id);
             byte[] bytes = multipartFile.getBytes();
             photoEntity.setImageData(bytes);
             photoRepository.save(photoEntity);
-
+            logger.info("Класс RentApartmentServiceImpl метод addPhoto успешно выполнил сохранение фотографии в базу данных для квартиры с id:{}", id);
             return PHOTO_ADDED;
         } catch (IOException e) {
+            logger.error("Класс RentApartmentServiceImpl метод addPhoto получил ошибку при сохранении фотографии в базу данных для квартиры с id:{}", id);
             throw new PhotoException(SERVICE_UNAVAILABLE);
         }
     }

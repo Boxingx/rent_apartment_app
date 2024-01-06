@@ -49,9 +49,8 @@ public class ProcessingQueryHistoryScheduler {
      */
     @Scheduled(fixedDelay = 40_000)
     public void startProcessingQueryScheduler() {
-//        log.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
 
-        logger.info("Квартирный шедулер начал свою работу " + LocalDateTime.now());
+        logger.info("Квартирный(статус) шедулер начал свою работу " + LocalDateTime.now());
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesBySchedulerProcessingEquals("false");
         for (BookingHistoryEntity e : bookingHistoryEntities) {
             if (e.getEndDate().isBefore(ChronoLocalDate.from(LocalDateTime.now()))) {
@@ -65,7 +64,7 @@ public class ProcessingQueryHistoryScheduler {
 
     @Scheduled(fixedRate = 60_000)
     public void checkTokenScheduler() {
-//        log.info("Токен шедулер начал свою работу " + LocalDateTime.now());
+
         logger.info("Токен шедулер начал свою работу " + LocalDateTime.now());
         List<ClientApplicationEntity> clientEntities = clientRepository.findClientApplicationEntitiesByUserTokenNotNull();
         for (ClientApplicationEntity c : clientEntities) {

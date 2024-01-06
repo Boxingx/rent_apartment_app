@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -24,6 +26,8 @@ public class ReportServiceImpl implements ReportService {
 
     private final BookingHistoryRepository bookingHistoryRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(BookingHistoryRepository.class);
+
     @Override
     public String getReport(String year, Integer month) {
 
@@ -35,7 +39,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void report(List<BookingHistoryEntity> bookingHistoryEntities) {
-//        log.info("Старт выгрузки отчета");
+
+        logger.info("Класс ReportServiceImpl метод report начал выгрузку отчета");
         File template = new File("C:\\Users\\Alex\\IdeaProjects\\rent_apartment_app\\report_template.xlsx");
         try(FileInputStream fileInputStream = new FileInputStream(template);
             XSSFWorkbook book = new XSSFWorkbook(fileInputStream)) {
@@ -61,9 +66,10 @@ public class ReportServiceImpl implements ReportService {
             book.write(fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-//            log.info("Отчет выгружен");
+            logger.info("Класс ReportServiceImpl метод report - отчет выгружен");
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error("Класс ReportServiceImpl метод report - ошибка выгрузки отчета");
         }
     }
 
@@ -75,6 +81,7 @@ public class ReportServiceImpl implements ReportService {
             }
             return LocalDate.of(Integer.parseInt(year), month, 1);
         } catch (NumberFormatException ex) {
+            logger.error("Класс ReportServiceImpl метод prepareDate");
             throw new NumberFormatException(ex.getMessage());
         }
     }

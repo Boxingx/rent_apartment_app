@@ -13,6 +13,8 @@ import com.example.rent_module.model.dto.geocoder_city_to_location.ResultsLoc;
 import com.example.rent_module.model.entity.IntegrationInfoEntity;
 import com.example.rent_module.repository.IntegrationRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -30,9 +32,13 @@ public class GeoCoderRestTemplateManagerImpl implements GeoCoderRestTemplateMana
 
     private final IntegrationRepository integrationRepository;
 
+    private final static Logger logger = LoggerFactory.getLogger(GeoCoderRestTemplateManagerImpl.class);
+
 
     /**Метод для получения города по локации с использованием интеграционного сервиса геокодер*/
     public String getInfoByLocation(PersonsLocation location) {
+        logger.info("Класс GeoCoderRestTemplateManagerImpl, метод getInfoByLocation начал выполнять REST-запрос для координат: latitude={}, longitude={}",
+                location.getLatitude(), location.getLongitude());
         RestTemplate restTemplate = new RestTemplate();
 
         IntegrationInfoEntity config = integrationRepository.findById(1l)
@@ -46,12 +52,16 @@ public class GeoCoderRestTemplateManagerImpl implements GeoCoderRestTemplateMana
                 new HttpEntity<>(null),
                 GeoCoderResponse.class).getBody();
 
+        logger.info("Класс GeoCoderRestTemplateManagerImpl, метод getInfoByLocation успешно выполнил REST-запрос для координат: latitude={}, longitude={}",
+                location.getLatitude(), location.getLongitude());
         return parseInfoByLocation(locationInfo);
+
     }
 
 
     /**Метод для получения широты и долготы по городу с использованием интеграционного сервиса геокодер*/
     public Geometry getLocationByCity(String city, String country) {
+        logger.info("Класс GeoCoderRestTemplateManagerImpl, метод getLocationByCity начал выполнять REST-запрос для населенного пункта {}, {}", country, city);
         RestTemplate restTemplate = new RestTemplate();
 
         IntegrationInfoEntity config = integrationRepository.findById(3l)
@@ -64,6 +74,7 @@ public class GeoCoderRestTemplateManagerImpl implements GeoCoderRestTemplateMana
                 HttpMethod.GET,
                 new HttpEntity<>(null),
                 GeoCoderResponseLocation.class).getBody();
+        logger.info("Класс GeoCoderRestTemplateManagerImpl, метод getLocationByCity успешно выполнил REST-запрос для населенного пункта {}, {}", country, city);
 
         return getGeometryByLocation(geoCoderResponse);
     }

@@ -7,6 +7,8 @@ import com.example.rent_module.model.dto.yandex_weather_integration.YandexWeathe
 import com.example.rent_module.model.entity.IntegrationInfoEntity;
 import com.example.rent_module.repository.IntegrationRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,14 @@ public class YandexWeatherRestTemplateManagerImpl implements YandexWeatherRestTe
 
     private final IntegrationRepository integrationRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(YandexWeatherRestTemplateManagerImpl.class);
+
     /**Метод прокидывает запрос в сервис яндекс погоды. Принимает широту и долготу, по ней получает большой Json с лишней информацией
      * которая фильтруется с помощью приватного метода parseWeatherByLocation, после этой операции возвращается только состояние погоды
      * и температура в формате String. Хедеры загружаются с помощью метода prepareHeadersForWeather */
     public String getWeatherByCoordinates(String latitude, String longitude) {
+        logger.info("Класс YandexWeatherRestTemplateManagerImpl метод getWeatherByCoordinates начал выполнять REST-запрос для координат: latitude={}, longitude ={}",
+                latitude, longitude);
         RestTemplate restTemplate = new RestTemplate();
 
         IntegrationInfoEntity config = integrationRepository.findById(2l)
@@ -39,6 +45,8 @@ public class YandexWeatherRestTemplateManagerImpl implements YandexWeatherRestTe
                 new HttpEntity<>(prepareHeadersForWeather(config)),
                 YandexWeatherResponse.class).getBody();
 
+        logger.info("Класс YandexWeatherRestTemplateManagerImpl метод getWeatherByCoordinates успешно выполнил REST-запрос для координат: latitude={}, longitude ={}",
+                latitude, longitude);
         return parseWeatherByLocation(weather);
 
     }
@@ -47,10 +55,13 @@ public class YandexWeatherRestTemplateManagerImpl implements YandexWeatherRestTe
     /**Метод прокидывает запрос в сервис яндекс погоды. Принимает объект с широтой и долготой, по ним получает объект YandexWeatherResponse
      * в котором есть состояние погоды и температура и возвращает его. Хедеры загружаются с помощью метода prepareHeadersForWeather */
     public YandexWeatherResponse getWeatherByLocation(PersonsLocation location) {
+        logger.info("Класс YandexWeatherRestTemplateManagerImpl метод getWeatherByLocation начал выполнять REST-запрос для координат: latitude={}, longitude ={}",
+                location.getLatitude(), location.getLongitude());
         RestTemplate restTemplate = new RestTemplate();
 
         IntegrationInfoEntity config = integrationRepository.findById(2l)
                 .orElseThrow(() -> new IntegrationConfigurationException(ERROR_DESCRIPTION));
+        //todo можно ли в лямбде написать в логер? как логировать в таком случае
 
         YandexWeatherResponse weather = restTemplate.exchange(String.format(config.getServicePath(),
                         location.getLatitude(),
@@ -58,6 +69,8 @@ public class YandexWeatherRestTemplateManagerImpl implements YandexWeatherRestTe
                 HttpMethod.GET,
                 new HttpEntity<>(prepareHeadersForWeather(config)),
                 YandexWeatherResponse.class).getBody();
+        logger.info("Класс YandexWeatherRestTemplateManagerImpl метод getWeatherByLocation успешно выполнил REST-запрос для координат: latitude={}, longitude ={}",
+                location.getLatitude(), location.getLongitude());
 
         return weather;
     }
