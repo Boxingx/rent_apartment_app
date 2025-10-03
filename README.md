@@ -41,7 +41,7 @@
 
 При неверном пароле получаем уведомление 
 
-![wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/2f9c30e4-9079-4bd6-9a7f-72f71ac19b5a)
+<img width="1363" height="567" alt="wrong_pass2" src="https://github.com/user-attachments/assets/ad4a59fd-7df1-4bf5-8bcb-745e440886a1" />
 
 
 3 ЭТАП - арендодатель добавляет квартиру которую хочет сдать в аренду
@@ -138,7 +138,9 @@ Kafka
 Из интеграций это яндекс погода, для того что бы получать данные о погоде по локации, а так же геокодер для получения широты и долготы по имени города и наоборот для получения города по локации. 
 
 
+Также присутствует опция выгрузки истории бронирований в Excel-файл с помощью Apache POI.
 
+![report](https://github.com/Boxingx/rent_apartment_app/assets/130319720/40f7eea6-0af4-4173-80f7-768d47fc9242)
 
 
 
