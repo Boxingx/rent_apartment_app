@@ -44,9 +44,6 @@
 <img width="1363" height="567" alt="wrong_pass2" src="https://github.com/user-attachments/assets/ad4a59fd-7df1-4bf5-8bcb-745e440886a1" />
 
 
-![wrong_reg](https://github.com/Boxingx/rent_apartment_app/assets/130319720/2f9c30e4-9079-4bd6-9a7f-72f71ac19b5a)
-
-
 3 ЭТАП - арендодатель добавляет квартиру которую хочет сдать в аренду
 
 ![6reg_new_apt_alex](https://github.com/Boxingx/rent_apartment_app/assets/130319720/40170dc6-0c38-4f78-97a6-1d494f9b1657)
