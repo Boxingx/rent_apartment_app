@@ -26,6 +26,7 @@ public class TopicListenerScheduler {
 
         List<String> messages = consumerListener.getMessages();
 
+        //todo хардкод убрать
         if (nonNull(messages)) {
             for (String message : messages) {
                 productModuleController.addProductForBooking(Long.parseLong(message), "123weather123");

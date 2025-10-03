@@ -6,7 +6,6 @@ import com.example.rent_module.model.dto.ApartmentDto;
 import com.example.rent_module.model.dto.ApartmentWithMessageDto;
 import com.example.rent_module.model.dto.GetAddressInfoResponseDto;
 import com.example.rent_module.model.dto.PersonsLocation;
-import com.example.rent_module.model.entity.RatingEntity;
 import com.example.rent_module.service.AuthService;
 import com.example.rent_module.service.RentApartmentService;
 import com.example.rent_module.service.ReportService;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.example.rent_module.constant_project.ConstantProject.*;
 import static java.util.Objects.isNull;
@@ -49,6 +47,7 @@ public class RentApartmentController {
         return kafkaProducer.sendMessageToTopic(mes);
     }
 
+    /**Метод выгрузки отчета по определенному году и месяцу*/
     @GetMapping("/api/report")
     public String getReport(@RequestParam String year, @RequestParam Integer month) {
         return reportService.getReport(year, month);

@@ -42,7 +42,7 @@ public class ProcessingQueryHistoryScheduler {
 
     private final RatingRepository ratingRepository;
 
-    public static DateTimeFormatter authFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS");
+    public static DateTimeFormatter authFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n");
     /**
      * Метод с шедулером который переодически проверяет активные бронирования, если бронирование уже закончилось он сделает квартиру снова свободной,
      * а так же само бронирование будет закончено.
@@ -62,6 +62,9 @@ public class ProcessingQueryHistoryScheduler {
         }
     }
 
+    /**
+     * Метод с шедулером, который каждую минуту проверяет не просроченный ли токен у пользователя
+     */
     @Scheduled(fixedRate = 60_000)
     public void checkTokenScheduler() {
 
@@ -101,7 +104,10 @@ public class ProcessingQueryHistoryScheduler {
             apartmentEntityById.setAverageRating(Double.toString(entry.getValue()));
         }
     }
-
+    /**
+     * Метод который парсит токен из БД в подходящий формат для LocalDateTime.
+     * Например строка testToken|2030-10-07T12:49:43.641604600 будет преобразована в 2030-10-07T12:49:43.641604600
+     * */
     private LocalDateTime parseTokenValue(String token) {
         int index = token.indexOf("|") + 1;
         String timeValue = token.substring(index);

@@ -35,7 +35,7 @@ public class ReportServiceImpl implements ReportService {
         List<BookingHistoryEntity> bookingHistoryEntities = bookingHistoryRepository.getBookingHistoryEntitiesByStartDateBetween(startDate,
                 prepareDate(null, null, startDate));
         report(bookingHistoryEntities);
-        return " ";
+        return "Отчет выгружен";
     }
 
     private void report(List<BookingHistoryEntity> bookingHistoryEntities) {
@@ -73,6 +73,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
+    /**Метод если нулевая дата вернет дату с первым днем месяца, а если не нулевая то вернет последний день месяца*/
     private LocalDate prepareDate(String year, Integer month, LocalDate date) {
 
         try {
